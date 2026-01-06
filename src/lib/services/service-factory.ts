@@ -5,7 +5,7 @@
 
 import { PasswordService } from './password-service';
 import { IndexedDBPasswordRepository, IPasswordRepository } from '@/lib/db/password-repository';
-import { ENV_CONFIG } from '@/lib/config/app-config';
+import { API_CONFIG } from '@/lib/config/app-config';
 
 /**
  * Service configuration interface
@@ -49,10 +49,11 @@ export class ServiceFactory {
 
   /**
    * Create password service with proper dependencies
+   * Refactored: Sử dụng API_CONFIG thay vì ENV_CONFIG để consistent
    */
   static createPasswordService(config: ServiceFactoryConfig = {}): PasswordService {
     const {
-      enableApiSync = ENV_CONFIG.isDevelopment,
+      enableApiSync = API_CONFIG.ENABLE_SYNC, // Sử dụng centralized API config
       repositoryType = 'indexeddb'
     } = config;
 
@@ -82,10 +83,11 @@ export class ServiceFactory {
 
   /**
    * Get default password service
+   * Refactored: Sử dụng API_CONFIG để consistent configuration
    */
   static getDefaultPasswordService(): PasswordService {
     return this.createPasswordService({
-      enableApiSync: ENV_CONFIG.isDevelopment,
+      enableApiSync: API_CONFIG.ENABLE_SYNC, // Centralized config source
       repositoryType: 'indexeddb'
     });
   }

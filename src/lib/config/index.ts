@@ -33,6 +33,15 @@ export {
 // Environment configuration
 export { config as environmentConfig } from './environment';
 
+// URL Builder utilities
+export { 
+  ApiUrlBuilder, 
+  buildApiBaseUrl, 
+  validateUrlConfiguration, 
+  DEPLOYMENT_CONSTANTS 
+} from './url-builder';
+export type { UrlValidationResult } from './url-builder';
+
 // Configuration validation
 export { 
   validateAppConfig, 

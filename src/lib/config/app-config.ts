@@ -5,6 +5,7 @@
 
 import { QueryClient } from "@tanstack/react-query";
 import { ENV_ACCESS } from './env-utils';
+import { buildApiBaseUrl } from './url-builder';
 
 /**
  * App metadata configuration
@@ -18,15 +19,13 @@ export const APP_CONFIG = {
 /**
  * Environment detection utilities
  * Centralized environment access với validation
+ * 
+ * Refactored: Loại bỏ deprecated API config để tránh duplication
  */
 export const ENV_CONFIG = {
   // App environment
   isDevelopment: ENV_ACCESS.isDevelopment,
   isProduction: ENV_ACCESS.isProduction,
-  
-  // API configuration với validation - Updated to match API_CONFIG
-  API_BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', 'https://yapee.online/api/passwords'),
-  API_TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 5000),
   
   // Domain configuration
   APP_DOMAIN: ENV_ACCESS.getEnvVar('VITE_APP_DOMAIN', 'yapee.online'),
@@ -82,17 +81,36 @@ export const ROUTES = {
 
 /**
  * API configuration cho hybrid approach
+ * Refactored: Sử dụng URL Builder để tách biệt complex logic
  */
+import { buildApiBaseUrl } from './url-builder';
+
+/**
+ * API Default Configuration
+ * Centralized defaults để tránh magic values
+ */
+const API_DEFAULTS = {
+  // Smart sync enabling: production default true, development false để tránh timeout
+  DEFAULT_SYNC_ENABLED: ENV_ACCESS.isProduction,
+  // Fallback sync disabled để tránh API timeout trong development
+  FALLBACK_SYNC_ENABLED: false,
+  DEFAULT_TIMEOUT: 10000, // 10s timeout cho production stability
+  MIN_TIMEOUT: 3000, // Minimum timeout để tránh premature failures
+} as const;
+
 export const API_CONFIG = {
-  // Sử dụng full URL cho production để pass validation
-  BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', 
-    ENV_ACCESS.isProduction 
-      ? `${ENV_ACCESS.getEnvVar('VITE_APP_URL', 'https://silver-bublanina-ab8828.netlify.app')}/.netlify/functions/api`
-      : '/api'
+  // Clean URL construction với proper separation of concerns
+  BASE_URL: buildApiBaseUrl(),
+  // Smart sync configuration với proper fallback logic
+  ENABLE_SYNC: ENV_ACCESS.getBooleanEnv(
+    'VITE_ENABLE_API_SYNC', 
+    // Sử dụng fallback disabled để tránh timeout issues trong development
+    ENV_ACCESS.isDevelopment ? API_DEFAULTS.FALLBACK_SYNC_ENABLED : API_DEFAULTS.DEFAULT_SYNC_ENABLED
   ),
-  // Smart sync enabling: production default true, có thể override bằng env var
-  ENABLE_SYNC: ENV_ACCESS.getBooleanEnv('VITE_ENABLE_API_SYNC', ENV_ACCESS.isProduction),
-  TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 10000), // Tăng timeout lên 10s
+  TIMEOUT: Math.max(
+    ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', API_DEFAULTS.DEFAULT_TIMEOUT),
+    API_DEFAULTS.MIN_TIMEOUT
+  ),
 } as const;
 
 /**

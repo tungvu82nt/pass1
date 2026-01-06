@@ -14,7 +14,7 @@ import { PasswordEntry, PasswordInsert, PasswordStats } from '@/lib/types/models
 import { db } from '@/lib/db/db';
 import { PasswordApiService } from '@/lib/api/password-api';
 import { logger } from '@/lib/utils/logger';
-import { getCurrentConfig } from '@/lib/config/config-factory';
+import { getCurrentConfig, validateUrlConfiguration } from '@/lib/config';
 
 /**
  * Service configuration
@@ -36,6 +36,12 @@ export class PasswordService {
     // Use factory config as default, allow override
     const factoryConfig = getCurrentConfig();
     this.config = config || { enableApiSync: factoryConfig.api.enableSync };
+    
+    // Validate URL configuration on initialization
+    const urlValidation = validateUrlConfiguration();
+    if (!urlValidation.isValid) {
+      logger.warn('URL configuration validation failed', { errors: urlValidation.errors });
+    }
     
     logger.debug('PasswordService initialized', { config: this.config });
   }

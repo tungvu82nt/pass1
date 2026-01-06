@@ -36,6 +36,18 @@ const apiConfigSchema = z.object({
 }, {
   message: 'Production API must use HTTPS when sync is enabled',
   path: ['BASE_URL'],
+}).refine((config) => {
+  // Validate URL không chứa hardcoded Netlify URLs trong production
+  const isNetlifyFallback = config.BASE_URL.includes('silver-bublanina-ab8828.netlify.app');
+  if (isNetlifyFallback) {
+    logger.warn('Using Netlify fallback URL - consider updating VITE_APP_URL env var', {
+      url: config.BASE_URL
+    });
+  }
+  return true; // Warning only, không fail validation
+}, {
+  message: 'Consider updating VITE_APP_URL environment variable',
+  path: ['BASE_URL'],
 });
 
 /**
