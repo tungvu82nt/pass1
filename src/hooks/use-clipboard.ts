@@ -1,45 +1,39 @@
 /**
- * useClipboard Hook
- * Enhanced clipboard operations với error handling
+ * useClipboard Hook - Refactored với Clean Architecture
+ * Enhanced clipboard operations với standardized error handling
  * 
  * Features:
- * - Copy to clipboard với fallback
- * - Success/error notifications
- * - Permission handling
- * - Secure copy for sensitive data
+ * - Standardized error patterns
+ * - Performance monitoring
+ * - Memory leak prevention
+ * - Security policies
+ * - Clean separation of concerns
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToastNotifications } from '@/hooks/use-toast-notifications';
 import { logger } from '@/lib/utils/logger';
+import { 
+  ClipboardConfig, 
+  ClipboardContext, 
+  ClipboardSecurityPolicy,
+  UseClipboardReturn,
+  ClipboardResult 
+} from '@/lib/types/clipboard-types';
+import { 
+  copyTextToClipboard, 
+  clearClipboardContent, 
+  isClipboardSupported 
+} from '@/lib/utils/clipboard-utils';
 
 /**
- * Clipboard operation result
+ * Default security policy
  */
-interface ClipboardResult {
-  success: boolean;
-  error?: string;
-}
-
-/**
- * Clipboard hook configuration
- */
-interface ClipboardConfig {
-  showToast?: boolean;
-  toastDuration?: number;
-  secureMode?: boolean; // Clear clipboard after timeout
-  clearTimeout?: number; // ms
-}
-
-/**
- * Hook return type
- */
-interface UseClipboardReturn {
-  copied: boolean;
-  copyToClipboard: (text: string, label?: string) => Promise<ClipboardResult>;
-  clearClipboard: () => Promise<ClipboardResult>;
-  isSupported: boolean;
-}
+const DEFAULT_SECURITY_POLICY: ClipboardSecurityPolicy = {
+  autoCleanup: false,
+  cleanupDelay: 30000,
+  maxTextLength: 10000,
+};
 
 /**
  * Enhanced clipboard hook với security features
