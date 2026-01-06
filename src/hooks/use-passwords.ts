@@ -15,6 +15,7 @@ import { PasswordEntry, PasswordInsert, PasswordStats } from '@/lib/types/models
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useLoadingState } from '@/hooks/use-loading-state';
 import { PasswordService } from '@/lib/services/password-service';
+import { ServiceFactory } from '@/lib/services/service-factory';
 import { SUCCESS_MESSAGES } from '@/lib/constants/app-constants';
 import { logger } from '@/lib/utils/logger';
 
@@ -55,10 +56,10 @@ export const usePasswords = (config: UsePasswordsConfig = {}): UsePasswordsRetur
   const { handleAsyncError } = useErrorHandler();
   const { loading, error, executeOperation } = useLoadingState();
 
-  // Khởi tạo service với singleton pattern để tối ưu performance
+  // Khởi tạo service với factory pattern và memoization
   const passwordService = useMemo(() => {
-    logger.debug('Initializing PasswordService', { enableApiSync });
-    return PasswordService.getInstance({ enableApiSync });
+    logger.debug('Initializing PasswordService via Factory', { enableApiSync });
+    return ServiceFactory.getDefaultPasswordService();
   }, [enableApiSync]);
 
   // Cập nhật config khi enableApiSync thay đổi

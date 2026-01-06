@@ -17,9 +17,24 @@ export const APP_CONFIG = {
 
 /**
  * Environment detection utilities
- * @deprecated Use ENV_ACCESS from env-utils.ts instead
+ * Centralized environment access với validation
  */
-export const ENV_UTILS = ENV_ACCESS;
+export const ENV_CONFIG = {
+  // App environment
+  isDevelopment: ENV_ACCESS.isDevelopment,
+  isProduction: ENV_ACCESS.isProduction,
+  
+  // API configuration với validation - Updated to match API_CONFIG
+  API_BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', 'https://yapee.online/api/passwords'),
+  API_TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 5000),
+  
+  // Domain configuration
+  APP_DOMAIN: ENV_ACCESS.getEnvVar('VITE_APP_DOMAIN', 'yapee.online'),
+  APP_URL: ENV_ACCESS.getEnvVar('VITE_APP_URL', 'https://yapee.online'),
+  
+  // Database URL (nếu có)
+  DATABASE_URL: ENV_ACCESS.getEnvVar('DATABASE_URL', ''),
+} as const;
 
 /**
  * Theme configuration
@@ -69,8 +84,9 @@ export const ROUTES = {
  * API configuration cho hybrid approach
  */
 export const API_CONFIG = {
-  BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', 'http://localhost:3001/api/passwords'),
-  ENABLE_SYNC: ENV_ACCESS.isDevelopment, // Chỉ enable API sync trong development
+  BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', `${ENV_ACCESS.getEnvVar('VITE_APP_URL', 'https://yapee.online')}/api/passwords`),
+  // Smart sync enabling: production default true, có thể override bằng env var
+  ENABLE_SYNC: ENV_ACCESS.getBooleanEnv('VITE_ENABLE_API_SYNC', ENV_ACCESS.isProduction),
   TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 5000),
 } as const;
 

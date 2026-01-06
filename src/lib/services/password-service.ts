@@ -22,12 +22,13 @@ interface ServiceConfig {
 }
 
 /**
- * Main Password Service - Singleton Pattern
- * Đảm bảo chỉ có một instance duy nhất để tối ưu performance
+ * Main Password Service - Improved Singleton Pattern
+ * Đảm bảo chỉ có một instance duy nhất với proper disposal
  */
 export class PasswordService {
   private static instance: PasswordService;
   private config: ServiceConfig;
+  private disposed = false;
 
   private constructor(config: ServiceConfig = { enableApiSync: false }) {
     this.config = config;
@@ -37,10 +38,28 @@ export class PasswordService {
    * Singleton pattern - lấy instance duy nhất
    */
   public static getInstance(config?: ServiceConfig): PasswordService {
-    if (!PasswordService.instance) {
+    if (!PasswordService.instance || PasswordService.instance.disposed) {
       PasswordService.instance = new PasswordService(config);
     }
     return PasswordService.instance;
+  }
+
+  /**
+   * Dispose service instance - for cleanup
+   */
+  public dispose(): void {
+    this.disposed = true;
+    logger.debug('PasswordService disposed');
+  }
+
+  /**
+   * Reset singleton instance - for testing
+   */
+  public static resetInstance(): void {
+    if (PasswordService.instance) {
+      PasswordService.instance.dispose();
+    }
+    PasswordService.instance = null as any;
   }
 
   /**
