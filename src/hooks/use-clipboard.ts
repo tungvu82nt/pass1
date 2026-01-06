@@ -156,7 +156,7 @@ export const useClipboard = (config: ClipboardConfig = {}): UseClipboardReturn =
 
       return { success: false, error: errorMessage };
     }
-  }, [isSupported, fallbackCopy, showToast, toast, toastDuration, secureMode, clearTimeout]);
+  }, [isSupported, fallbackCopy, showToast, showSuccess, showError, toastDuration, secureMode, clearTimeout]);
 
   /**
    * Clear clipboard content
