@@ -78,6 +78,18 @@ export type {
   CompleteConfiguration
 } from './config-factory';
 
+// New: API-specific validation
+export {
+  validateApiConfiguration,
+  getApiConfigRecommendations
+} from './api-config-validator';
+
+// New: Configuration management
+export {
+  ConfigurationManager,
+  configManager
+} from './config-manager';
+
 // Type exports
 export type { DomainType, UrlType } from './domain-config';
 export type { Config } from './environment';

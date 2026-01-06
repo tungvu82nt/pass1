@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/lib/theme-context";
 import { createQueryClient, THEME_CONFIG, ROUTES } from "@/lib/config/app-config";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { DevTools } from "@/components/DevTools";
 import { logger } from "@/lib/utils/logger";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const queryClient = createQueryClient();
  * - ThemeProvider: Quản lý theme (dark/light/system)
  * - TooltipProvider: Cung cấp tooltip context
  * - BrowserRouter: Routing cho SPA
+ * - DevTools: Development utilities (chỉ trong dev mode)
  * 
  * Provider hierarchy được sắp xếp theo thứ tự dependency:
  * ErrorBoundary -> QueryClient -> Theme -> Tooltip -> Router
@@ -49,6 +51,8 @@ const App = () => (
               <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
             </Routes>
           </BrowserRouter>
+          {/* Development Tools - chỉ hiển thị trong dev mode */}
+          <DevTools />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

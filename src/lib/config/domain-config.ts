@@ -42,6 +42,14 @@ export const getCurrentUrl = (): string => {
 };
 
 /**
+ * Global fallback for getCurrentUrl function
+ * Prevents ReferenceError in production builds
+ */
+if (typeof window !== 'undefined') {
+  (window as any).getCurrentUrl = getCurrentUrl;
+}
+
+/**
  * Domain validation utilities
  */
 export const isDomainValid = (domain: string): boolean => {
