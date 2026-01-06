@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Full-Stack Engineer Agent",
+  "description": "Activates the Full-Stack Engineer Agent to analyze project structure, create development plans, implement features with proper testing, and maintain comprehensive documentation following the FSE-Agent methodology",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": []
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": ""
+  },
+  "workspaceFolderName": "the-tea-spirits-journey",
+  "shortName": "fse-agent-hook"
+}

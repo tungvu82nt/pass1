@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "curl",
+      "args": [
+        "-s",
+        "https://mcp.supabase.com/mcp?read_only=false&project_ref=tzvxhmrnaezqrchfgems"
+      ],
+      "env": {},
+      "disabled": true,
+      "autoApprove": []
+    }
+  }
+}
