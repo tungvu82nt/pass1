@@ -42,8 +42,32 @@ export {
   validateAllConfigs 
 } from './config-validator';
 
+// Runtime validation
+export {
+  validateRuntimeApiConfig,
+  validateRuntimeDatabaseConfig,
+  validateRuntimeDomainConfig,
+  validateAllRuntimeConfigs,
+  initializeConfigValidation
+} from './runtime-validator';
+export type { ConfigHealthStatus } from './runtime-validator';
+
 // Toast configuration
 export { TOAST_CONFIG } from './toast-config';
+
+// Configuration factory
+export {
+  ConfigurationFactory,
+  getCurrentConfig,
+  getConfigForProfile
+} from './config-factory';
+export type {
+  ConfigProfile,
+  ApiConfiguration,
+  DatabaseConfiguration,
+  ApplicationConfiguration,
+  CompleteConfiguration
+} from './config-factory';
 
 // Type exports
 export type { DomainType, UrlType } from './domain-config';

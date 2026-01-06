@@ -12,7 +12,7 @@ import { LoadingState, ErrorState, EmptyState } from "@/components/StateComponen
 import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { usePasswords } from "@/hooks/use-passwords"; // Updated import
-import { usePasswordForm } from "@/hooks/use-password-form";
+import { useFormState } from "@/hooks/use-form-state";
 import { PasswordEntry, PasswordInsert } from "@/lib/types/models"; // Updated import
 import { TIMING } from "@/lib/constants/app-constants";
 import { DOMAIN_CONFIG, API_CONFIG } from "@/lib/config/app-config";
@@ -62,7 +62,7 @@ const usePasswordOperations = () => {
     openEditForm,
     closeForm,
     resetForm
-  } = usePasswordForm();
+  } = useFormState();
 
   // Handler cho save operation với error handling
   const handleSave = useCallback(async (entryData: PasswordInsert) => {

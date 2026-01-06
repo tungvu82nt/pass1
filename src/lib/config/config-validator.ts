@@ -21,12 +21,21 @@ const appConfigSchema = z.object({
 });
 
 /**
- * API configuration schema
+ * API configuration schema với enhanced validation
  */
 const apiConfigSchema = z.object({
   BASE_URL: z.string().url('BASE_URL must be a valid URL'),
   ENABLE_SYNC: z.boolean(),
   TIMEOUT: z.number().min(1000, 'Timeout must be at least 1000ms').max(30000, 'Timeout cannot exceed 30000ms'),
+}).refine((config) => {
+  // Validate production URL format
+  if (config.ENABLE_SYNC && !config.BASE_URL.startsWith('https://')) {
+    return false;
+  }
+  return true;
+}, {
+  message: 'Production API must use HTTPS when sync is enabled',
+  path: ['BASE_URL'],
 });
 
 /**

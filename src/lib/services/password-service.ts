@@ -7,12 +7,14 @@
  * - API và IndexedDB integration
  * - Error handling
  * - Type safety
+ * - Configuration-aware operations
  */
 
 import { PasswordEntry, PasswordInsert, PasswordStats } from '@/lib/types/models';
 import { db } from '@/lib/db/db';
 import { PasswordApiService } from '@/lib/api/password-api';
 import { logger } from '@/lib/utils/logger';
+import { getCurrentConfig } from '@/lib/config/config-factory';
 
 /**
  * Service configuration
@@ -30,8 +32,12 @@ export class PasswordService {
   private config: ServiceConfig;
   private disposed = false;
 
-  private constructor(config: ServiceConfig = { enableApiSync: false }) {
-    this.config = config;
+  private constructor(config?: ServiceConfig) {
+    // Use factory config as default, allow override
+    const factoryConfig = getCurrentConfig();
+    this.config = config || { enableApiSync: factoryConfig.api.enableSync };
+    
+    logger.debug('PasswordService initialized', { config: this.config });
   }
 
   /**
