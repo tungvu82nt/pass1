@@ -27,10 +27,6 @@ export const ENV_CONFIG = {
   isDevelopment: ENV_ACCESS.isDevelopment,
   isProduction: ENV_ACCESS.isProduction,
   
-  // Domain configuration
-  APP_DOMAIN: ENV_ACCESS.getEnvVar('VITE_APP_DOMAIN', 'yapee.online'),
-  APP_URL: ENV_ACCESS.getEnvVar('VITE_APP_URL', 'https://yapee.online'),
-  
   // Database URL (nếu có)
   DATABASE_URL: ENV_ACCESS.getEnvVar('DATABASE_URL', ''),
 } as const;
@@ -129,9 +125,9 @@ export const DATABASE_CONFIG = {
 export const DOMAIN_CONFIG = {
   APP_NAME: "Memory Safe Guard",
   APP_DESCRIPTION: "Quản lý mật khẩu an toàn và hiện đại",
-  DOMAIN: "yapee.online",
-  HOMEPAGE: "https://yapee.online",
+  DOMAIN: "silver-bublanina-ab8828.netlify.app",
+  HOMEPAGE: "https://silver-bublanina-ab8828.netlify.app",
   // Thêm properties để consistent với Footer component
-  PRODUCTION_DOMAIN: "yapee.online",
-  PRODUCTION_URL: "https://yapee.online",
+  PRODUCTION_DOMAIN: "silver-bublanina-ab8828.netlify.app",
+  PRODUCTION_URL: "https://silver-bublanina-ab8828.netlify.app",
 } as const;

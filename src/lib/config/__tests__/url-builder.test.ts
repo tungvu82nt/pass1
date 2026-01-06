@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApiUrlBuilder, DEPLOYMENT_CONSTANTS } from '../url-builder';
 import { ENV_ACCESS } from '../env-utils';
+import { TEST_CONSTANTS, TEST_UTILS } from '@/lib/constants/test-constants';
 
 // Mock ENV_ACCESS
 vi.mock('../env-utils', () => ({
@@ -55,7 +56,7 @@ describe('ApiUrlBuilder', () => {
     });
 
     it('should build production URL correctly', () => {
-      const mockAppUrl = 'https://yapee.online';
+      const mockAppUrl = 'https://silver-bublanina-ab8828.netlify.app';
       vi.mocked(ENV_ACCESS.getEnvVar)
         .mockReturnValueOnce('') // No explicit API URL
         .mockReturnValueOnce(mockAppUrl); // App URL

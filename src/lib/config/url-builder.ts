@@ -24,7 +24,7 @@ export const DEPLOYMENT_CONSTANTS = {
   DEV_API_PATH: '/api',
   
   // Default production domain
-  DEFAULT_PRODUCTION_URL: 'https://yapee.online',
+  DEFAULT_PRODUCTION_URL: 'https://silver-bublanina-ab8828.netlify.app',
 } as const;
 
 /**
@@ -110,18 +110,10 @@ export class ApiUrlBuilder {
       return cachedAppUrl;
     }
 
-    // Thử lấy từ env var
-    const envAppUrl = ENV_ACCESS.getEnvVar('VITE_APP_URL');
-    if (envAppUrl && isValidUrl(envAppUrl)) {
-      cachedAppUrl = envAppUrl;
-      return envAppUrl;
-    }
-
-    // Fallback logic
+    // Sử dụng fallback URL trực tiếp
     const fallbackUrl = DEPLOYMENT_CONSTANTS.NETLIFY_FALLBACK_URL;
-    logger.warn('Using fallback app URL', { 
-      fallback: fallbackUrl,
-      reason: envAppUrl ? 'Invalid URL format' : 'Missing env var'
+    logger.info('Using Netlify fallback URL', { 
+      fallback: fallbackUrl
     });
 
     cachedAppUrl = fallbackUrl;

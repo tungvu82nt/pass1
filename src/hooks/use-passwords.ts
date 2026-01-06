@@ -14,10 +14,10 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { PasswordEntry, PasswordInsert, PasswordStats } from '@/lib/types/models';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useLoadingState } from '@/hooks/use-loading-state';
-import { PasswordService } from '@/lib/services/password-service';
 import { ServiceFactory } from '@/lib/services/service-factory';
 import { SUCCESS_MESSAGES } from '@/lib/constants/app-constants';
 import { logger } from '@/lib/utils/logger';
+import { configurationService } from '@/lib/config';
 
 /**
  * Hook configuration
@@ -58,7 +58,11 @@ export const usePasswords = (config: UsePasswordsConfig = {}): UsePasswordsRetur
 
   // Khởi tạo service với factory pattern và memoization
   const passwordService = useMemo(() => {
-    logger.debug('Initializing PasswordService via Factory', { enableApiSync });
+    logger.debug('Initializing PasswordService via Factory', { 
+      enableApiSync,
+      apiBaseUrl: configurationService.getApiBaseUrl(),
+      isProduction: configurationService.isProduction()
+    });
     return ServiceFactory.getDefaultPasswordService();
   }, [enableApiSync]);
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useConfigHealth } from '@/hooks/use-config-health';
+import { useConfigurationHealth } from '@/hooks/use-configuration-health';
 import { cn } from '@/lib/utils';
 
 /**
@@ -32,30 +32,25 @@ export const ConfigHealthIndicator = ({
 }: ConfigHealthIndicatorProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { 
-    status, 
-    healthScore, 
-    isHealthy, 
-    isProductionReady,
-    hasWarnings,
-    hasErrors,
-    warningCount,
-    errorCount,
-    refreshStatus 
-  } = useConfigHealth({
-    autoCheck: true,
-    showToastWarnings: false // Không spam toast notifications
-  });
+    health,
+    checkHealth,
+    isChecking
+  } = useConfigurationHealth();
 
   // Không hiển thị trong production trừ khi có lỗi critical hoặc được force
   const isProduction = import.meta.env.PROD;
-  if (isProduction && !showInProduction && !hasErrors) {
+  if (isProduction && !showInProduction && !health.errors.length) {
     return null;
   }
 
-  // Không hiển thị nếu chưa có status
-  if (!status) {
+  // Không hiển thị nếu chưa có health data
+  if (!health.lastCheck) {
     return null;
   }
+
+  const hasErrors = health.errors.length > 0;
+  const hasWarnings = health.warnings.length > 0;
+  const isHealthy = health.isHealthy;
 
   /**
    * Get health indicator color và icon

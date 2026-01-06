@@ -81,7 +81,7 @@ export class ConfigurationFactory {
         retryDelay: 1000,
       },
       production: {
-        baseUrl: 'https://yapee.online/api/passwords',
+        baseUrl: 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions/api',
         enableSync: true,
         timeout: 5000,
         retryAttempts: 3,

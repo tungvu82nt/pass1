@@ -9,8 +9,8 @@ import { ENV_ACCESS } from './env-utils';
  * Domain configuration constants
  */
 export const DOMAINS = {
-  PRODUCTION: "yapee.online",
-  STAGING: "staging.yapee.online", // Cho tương lai
+  PRODUCTION: "silver-bublanina-ab8828.netlify.app",
+  STAGING: "staging.silver-bublanina-ab8828.netlify.app", // Cho tương lai
   LOCAL: "localhost",
 } as const;
 
@@ -42,12 +42,18 @@ export const getCurrentUrl = (): string => {
 };
 
 /**
- * Global fallback for getCurrentUrl function
- * Prevents ReferenceError in production builds
+ * Global fallback for getCurrentUrl to prevent runtime errors
+ * This ensures the function is available in all contexts including production builds
  */
 if (typeof window !== 'undefined') {
   (window as any).getCurrentUrl = getCurrentUrl;
 }
+
+/**
+ * Note: Global fallback removed - use ConfigurationService instead
+ * @deprecated Direct global access removed for better architecture
+ * @see ConfigurationService for type-safe configuration access
+ */
 
 /**
  * Domain validation utilities

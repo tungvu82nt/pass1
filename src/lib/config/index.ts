@@ -20,6 +20,15 @@ export {
   DOMAIN_CONFIG
 } from './app-config';
 
+// Configuration service (recommended approach)
+export {
+  configurationService,
+  getConfiguredUrl,
+  getConfiguredDomain,
+  isConfiguredProduction,
+  getConfiguredApiBaseUrl
+} from './configuration-service';
+
 // Domain-specific configurations
 export { 
   DOMAINS, 

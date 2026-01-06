@@ -1,68 +1,94 @@
 /**
- * Constants cho Database testing
- * Tập trung tất cả test messages và data để dễ maintain
+ * Test Constants
+ * Centralized constants cho testing để tránh hardcoded values
+ * 
+ * Features:
+ * - Consistent test data
+ * - Easy maintenance
+ * - Type safety
  */
 
-// Test messages với emoji và format nhất quán
-export const TEST_MESSAGES = {
-  // Client setup
-  URL_LOG: '🔍 URL:',
-  KEY_LOG: '🔑 Key:',
-  CLIENT_CREATED: '✅ Client created',
-  MISSING_ENV: '❌ Missing environment variables',
-  CLIENT_FAILED: '❌ Client creation failed:',
-
-  // Health check
-  HEALTH_CHECK: '🏥 Test health check...',
-  HEALTH_OK: '✅ Health check OK',
-  HEALTH_FAILED: '❌ Health check failed:',
-
-  // List data
-  LIST_TEST: '📋 Test list data...',
-  LIST_OK: '✅ List OK:',
-  LIST_FAILED: '❌ List failed:',
-  SAMPLE_DATA: '📊 Sample data:',
-
-  // Insert operations
-  INSERT_TEST: '➕ Test insert...',
-  INSERT_OK: '✅ Insert OK: ID',
-  INSERT_FAILED: '❌ Insert failed:',
-
-  // Cleanup và completion
-  CLEANUP: '🗑️ Cleanup done',
-  ALL_PASSED: '🎉 ALL TESTS PASSED!',
-
-  // Error handling
-  EXCEPTION: '💥 Exception:',
-  ERROR_CODE: '❌ Error code:',
-  ERROR_DETAILS: '❌ Error details:'
+/**
+ * Test URLs và Domains
+ */
+export const TEST_CONSTANTS = {
+  // Production URLs
+  PRODUCTION_DOMAIN: 'silver-bublanina-ab8828.netlify.app',
+  PRODUCTION_URL: 'https://silver-bublanina-ab8828.netlify.app',
+  PRODUCTION_API_URL: 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions/api',
+  
+  // Development URLs
+  DEV_DOMAIN: 'localhost',
+  DEV_URL: 'http://localhost:8080',
+  DEV_API_URL: '/api',
+  
+  // Test URLs
+  CUSTOM_API_URL: 'https://custom-api.example.com/api',
+  INVALID_URL: 'not-a-valid-url',
+  
+  // Mock data
+  MOCK_PASSWORD_ENTRY: {
+    id: 'test-id-123',
+    service: 'Test Service',
+    username: 'testuser',
+    password: 'testpass123',
+    notes: 'Test notes',
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01'),
+  },
+  
+  // API responses
+  MOCK_API_RESPONSES: {
+    SUCCESS: { success: true, data: [] },
+    ERROR: { success: false, error: 'Test error' },
+  },
 } as const;
 
-// Test data cho insert operations
-export const TEST_DATA = {
-  LINK: 'https://test.com',
-  USER: 'testuser',
-  PASS: 'testpass123'
+/**
+ * Test utilities
+ */
+export const TEST_UTILS = {
+  /**
+   * Tạo mock URL với domain
+   */
+  createMockUrl: (domain: string, path = '') => `https://${domain}${path}`,
+  
+  /**
+   * Tạo mock API URL
+   */
+  createMockApiUrl: (domain: string) => `https://${domain}/.netlify/functions/api`,
+  
+  /**
+   * Validate URL format
+   */
+  isValidTestUrl: (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  },
 } as const;
 
-// UI constants
-export const UI_CONSTANTS = {
-  PLACEHOLDER_TEXT: 'Nhấn "Run Direct Test" để bắt đầu...',
-  BUTTON_LOADING: 'Testing...',
-  BUTTON_IDLE: 'Run Direct Test',
-  CLEAR_BUTTON: 'Clear',
-
-  // Component descriptions
-  DESCRIPTIONS: [
-    '• Test này bypass tất cả abstraction layers',
-    '• Tạo Database client trực tiếp từ env vars',
-    '• Kiểm tra từng operation một cách chi tiết'
-  ]
+/**
+ * Environment-specific test constants
+ */
+export const ENV_TEST_CONSTANTS = {
+  PRODUCTION: {
+    domain: TEST_CONSTANTS.PRODUCTION_DOMAIN,
+    url: TEST_CONSTANTS.PRODUCTION_URL,
+    apiUrl: TEST_CONSTANTS.PRODUCTION_API_URL,
+  },
+  DEVELOPMENT: {
+    domain: TEST_CONSTANTS.DEV_DOMAIN,
+    url: TEST_CONSTANTS.DEV_URL,
+    apiUrl: TEST_CONSTANTS.DEV_API_URL,
+  },
 } as const;
 
-// Test configuration
-export const TEST_CONFIG = {
-  LIST_LIMIT: 5,
-  KEY_DISPLAY_LENGTH: 20,
-  MAX_LOG_HEIGHT: 'max-h-80'
-} as const;
+/**
+ * Type definitions
+ */
+export type TestEnvironment = keyof typeof ENV_TEST_CONSTANTS;
+export type TestConstants = typeof TEST_CONSTANTS;
