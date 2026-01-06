@@ -37,12 +37,11 @@ describe('ApiUrlBuilder', () => {
 
   describe('buildApiBaseUrl', () => {
     it('should return explicit env var when provided and valid', () => {
-      const mockUrl = 'https://custom-api.example.com/api';
-      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(mockUrl);
+      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(TEST_CONSTANTS.CUSTOM_API_URL);
 
       const result = ApiUrlBuilder.buildApiBaseUrl();
 
-      expect(result).toBe(mockUrl);
+      expect(result).toBe(TEST_CONSTANTS.CUSTOM_API_URL);
       expect(ENV_ACCESS.getEnvVar).toHaveBeenCalledWith('VITE_API_BASE_URL');
     });
 
@@ -56,15 +55,14 @@ describe('ApiUrlBuilder', () => {
     });
 
     it('should build production URL correctly', () => {
-      const mockAppUrl = 'https://silver-bublanina-ab8828.netlify.app';
       vi.mocked(ENV_ACCESS.getEnvVar)
         .mockReturnValueOnce('') // No explicit API URL
-        .mockReturnValueOnce(mockAppUrl); // App URL
+        .mockReturnValueOnce(TEST_CONSTANTS.PRODUCTION_URL); // App URL
       vi.mocked(ENV_ACCESS).isProduction = true;
 
       const result = ApiUrlBuilder.buildApiBaseUrl();
 
-      const expectedUrl = `${mockAppUrl}${DEPLOYMENT_CONSTANTS.NETLIFY_FUNCTIONS_PATH}`;
+      const expectedUrl = `${TEST_CONSTANTS.PRODUCTION_URL}${DEPLOYMENT_CONSTANTS.NETLIFY_FUNCTIONS_PATH}`;
       expect(result).toBe(expectedUrl);
     });
 
@@ -79,8 +77,7 @@ describe('ApiUrlBuilder', () => {
     });
 
     it('should cache results for performance', () => {
-      const mockUrl = 'https://cached.example.com/api';
-      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(mockUrl);
+      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(TEST_CONSTANTS.CUSTOM_API_URL);
 
       // First call
       const result1 = ApiUrlBuilder.buildApiBaseUrl();
@@ -92,9 +89,8 @@ describe('ApiUrlBuilder', () => {
     });
 
     it('should handle invalid URLs gracefully', () => {
-      const invalidUrl = 'not-a-valid-url';
       vi.mocked(ENV_ACCESS.getEnvVar)
-        .mockReturnValueOnce(invalidUrl) // Invalid explicit URL
+        .mockReturnValueOnce(TEST_CONSTANTS.INVALID_URL) // Invalid explicit URL
         .mockReturnValueOnce(''); // No app URL
       vi.mocked(ENV_ACCESS).isProduction = true;
 
@@ -108,8 +104,7 @@ describe('ApiUrlBuilder', () => {
 
   describe('validateConfiguration', () => {
     it('should return valid for correct configuration', () => {
-      const mockUrl = 'https://valid.example.com/api';
-      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(mockUrl);
+      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(TEST_CONSTANTS.CUSTOM_API_URL);
 
       const result = ApiUrlBuilder.validateConfiguration();
 
@@ -119,7 +114,7 @@ describe('ApiUrlBuilder', () => {
 
     it('should return errors for invalid configuration', () => {
       // Mock để return invalid URL
-      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue('invalid-url');
+      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(TEST_CONSTANTS.INVALID_URL);
 
       const result = ApiUrlBuilder.validateConfiguration();
 
@@ -130,8 +125,7 @@ describe('ApiUrlBuilder', () => {
 
   describe('resetCache', () => {
     it('should clear cached values', () => {
-      const mockUrl = 'https://cached.example.com/api';
-      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(mockUrl);
+      vi.mocked(ENV_ACCESS.getEnvVar).mockReturnValue(TEST_CONSTANTS.CUSTOM_API_URL);
 
       // Build URL to cache it
       ApiUrlBuilder.buildApiBaseUrl();

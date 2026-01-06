@@ -70,5 +70,15 @@ export const isProductionDomain = (): boolean => {
   return window.location.hostname === DOMAINS.PRODUCTION;
 };
 
+/**
+ * Global fallbacks for domain functions to prevent runtime errors
+ * This ensures the functions are available in all contexts including production builds
+ */
+if (typeof window !== 'undefined') {
+  (window as any).getCurrentUrl = getCurrentUrl;
+  (window as any).getCurrentDomain = getCurrentDomain;
+  (window as any).isProductionDomain = isProductionDomain;
+}
+
 export type DomainType = keyof typeof DOMAINS;
 export type UrlType = keyof typeof URLS;

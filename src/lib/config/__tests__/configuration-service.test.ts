@@ -5,6 +5,7 @@
 
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { configurationService } from '../configuration-service';
+import { TEST_CONSTANTS } from '@/lib/constants/test-constants';
 
 // Mock dependencies
 jest.mock('../domain-config', () => ({
@@ -31,16 +32,16 @@ describe('ConfigurationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Setup default mocks
-    mockGetCurrentUrl.mockReturnValue('https://silver-bublanina-ab8828.netlify.app');
-    mockGetCurrentDomain.mockReturnValue('silver-bublanina-ab8828.netlify.app');
+    // Setup default mocks với test constants
+    mockGetCurrentUrl.mockReturnValue(TEST_CONSTANTS.PRODUCTION_URL);
+    mockGetCurrentDomain.mockReturnValue(TEST_CONSTANTS.PRODUCTION_DOMAIN);
     mockIsProductionDomain.mockReturnValue(true);
   });
 
   describe('getCurrentUrl', () => {
     it('should return current URL successfully', () => {
       const result = configurationService.getCurrentUrl();
-      expect(result).toBe('https://silver-bublanina-ab8828.netlify.app');
+      expect(result).toBe(TEST_CONSTANTS.PRODUCTION_URL);
       expect(mockGetCurrentUrl).toHaveBeenCalled();
     });
 
@@ -50,14 +51,14 @@ describe('ConfigurationService', () => {
       });
 
       const result = configurationService.getCurrentUrl();
-      expect(result).toBe('https://silver-bublanina-ab8828.netlify.app'); // Fallback
+      expect(result).toBe(TEST_CONSTANTS.PRODUCTION_URL); // Fallback
     });
   });
 
   describe('getCurrentDomain', () => {
     it('should return current domain successfully', () => {
       const result = configurationService.getCurrentDomain();
-      expect(result).toBe('silver-bublanina-ab8828.netlify.app');
+      expect(result).toBe(TEST_CONSTANTS.PRODUCTION_DOMAIN);
       expect(mockGetCurrentDomain).toHaveBeenCalled();
     });
 
@@ -67,7 +68,7 @@ describe('ConfigurationService', () => {
       });
 
       const result = configurationService.getCurrentDomain();
-      expect(result).toBe('silver-bublanina-ab8828.netlify.app'); // Fallback
+      expect(result).toBe(TEST_CONSTANTS.PRODUCTION_DOMAIN); // Fallback
     });
   });
 
@@ -91,7 +92,7 @@ describe('ConfigurationService', () => {
   describe('getApiBaseUrl', () => {
     it('should return API base URL', () => {
       const result = configurationService.getApiBaseUrl();
-      expect(result).toBe('https://silver-bublanina-ab8828.netlify.app/api');
+      expect(result).toBe(`${TEST_CONSTANTS.PRODUCTION_URL}/api`);
     });
 
     it('should handle URL errors in API base URL', () => {
@@ -100,7 +101,7 @@ describe('ConfigurationService', () => {
       });
 
       const result = configurationService.getApiBaseUrl();
-      expect(result).toBe('https://silver-bublanina-ab8828.netlify.app/api'); // Fallback
+      expect(result).toBe(`${TEST_CONSTANTS.PRODUCTION_URL}/api`); // Fallback
     });
   });
 
