@@ -8,6 +8,30 @@ const pool = new Pool({
     }
 });
 
+// Initialize database table if not exists
+const initializeDatabase = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS passwords (
+                id SERIAL PRIMARY KEY,
+                service VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                password TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        // Create index for better search performance
+        await pool.query(`
+            CREATE INDEX IF NOT EXISTS idx_passwords_service ON passwords(service);
+            CREATE INDEX IF NOT EXISTS idx_passwords_username ON passwords(username);
+        `);
+    } catch (error) {
+        console.error('Database initialization error:', error);
+    }
+};
+
 // Helper function để parse request body
 const parseBody = (event) => {
     try {
@@ -30,6 +54,9 @@ const createResponse = (statusCode, body) => ({
 });
 
 export const handler = async (event, context) => {
+    // Initialize database on first request
+    await initializeDatabase();
+    
     // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return createResponse(200, {});
@@ -38,15 +65,14 @@ export const handler = async (event, context) => {
     const { httpMethod, path, queryStringParameters } = event;
     
     try {
-        // Parse path để lấy route
+        // Parse path để lấy route - Netlify Functions sẽ có path như /.netlify/functions/api
         const pathParts = path.split('/').filter(Boolean);
-        const isPasswordsRoute = pathParts.includes('passwords');
         
-        if (!isPasswordsRoute) {
-            return createResponse(404, { error: 'Route not found' });
-        }
+        // Lấy ID từ path nếu có (cho PUT/DELETE operations)
+        const id = pathParts[pathParts.length - 1];
+        const isIdPath = id && !isNaN(Number(id));
 
-        // GET /api/passwords - List all passwords
+        // GET /api - List all passwords
         if (httpMethod === 'GET') {
             const { searchQuery } = queryStringParameters || {};
             let query = 'SELECT * FROM passwords ORDER BY updated_at DESC';
@@ -65,7 +91,7 @@ export const handler = async (event, context) => {
             return createResponse(200, rows);
         }
 
-        // POST /api/passwords - Create new password
+        // POST /api - Create new password
         if (httpMethod === 'POST') {
             const { service, username, password } = parseBody(event);
             
@@ -80,9 +106,8 @@ export const handler = async (event, context) => {
             return createResponse(201, rows[0]);
         }
 
-        // PUT /api/passwords/:id - Update password
-        if (httpMethod === 'PUT') {
-            const id = pathParts[pathParts.length - 1];
+        // PUT /api/:id - Update password
+        if (httpMethod === 'PUT' && isIdPath) {
             const { service, username, password } = parseBody(event);
 
             if (!service || !username || !password) {
@@ -101,10 +126,8 @@ export const handler = async (event, context) => {
             return createResponse(200, rows[0]);
         }
 
-        // DELETE /api/passwords/:id - Delete password
-        if (httpMethod === 'DELETE') {
-            const id = pathParts[pathParts.length - 1];
-            
+        // DELETE /api/:id - Delete password
+        if (httpMethod === 'DELETE' && isIdPath) {
             const { rowCount } = await pool.query('DELETE FROM passwords WHERE id = $1', [id]);
             
             if (rowCount === 0) {

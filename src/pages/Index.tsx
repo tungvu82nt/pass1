@@ -10,7 +10,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { StatsSection, type StatsData } from "@/components/StatsSection";
 import { LoadingState, ErrorState, EmptyState } from "@/components/StateComponents";
 import { Footer } from "@/components/Footer";
-import { useToast } from "@/hooks/use-toast";
+import { useToastNotifications } from "@/hooks/use-toast-notifications";
 import { usePasswords } from "@/hooks/use-passwords"; // Updated import
 import { useFormState } from "@/hooks/use-form-state";
 import { PasswordEntry, PasswordInsert } from "@/lib/types/models"; // Updated import
@@ -38,7 +38,7 @@ const useAnimationDelays = (passwordsLength: number) => {
  * Updated để sử dụng hook mới với hybrid approach
  */
 const usePasswordOperations = () => {
-  const { toast } = useToast();
+  const { showSuccess, showError } = useToastNotifications();
   
   // Sử dụng hook mới với API sync enabled trong development
   const {
@@ -58,10 +58,12 @@ const usePasswordOperations = () => {
   const {
     isFormOpen,
     editEntry,
+    formMode,
+    isEditMode,
     openAddForm,
     openEditForm,
     closeForm,
-    resetForm
+    resetToAddMode
   } = useFormState();
 
   // Handler cho save operation với error handling
@@ -69,27 +71,17 @@ const usePasswordOperations = () => {
     try {
       if (editEntry) {
         await updatePassword(editEntry.id, entryData);
-        toast({
-          title: "Cập nhật thành công",
-          description: "Mật khẩu đã được cập nhật",
-        });
+        showSuccess("Cập nhật thành công", "Mật khẩu đã được cập nhật");
       } else {
         await addPassword(entryData);
-        toast({
-          title: "Thêm thành công",
-          description: "Mật khẩu mới đã được lưu",
-        });
+        showSuccess("Thêm thành công", "Mật khẩu mới đã được lưu");
       }
-      resetForm();
+      resetToAddMode();
     } catch (err) {
       console.error('Lỗi khi lưu mật khẩu:', err);
-      toast({
-        title: "Lỗi",
-        description: err instanceof Error ? err.message : "Không thể lưu mật khẩu",
-        variant: "destructive",
-      });
+      showError("Lỗi", err instanceof Error ? err.message : "Không thể lưu mật khẩu");
     }
-  }, [editEntry, updatePassword, addPassword, resetForm, toast]);
+  }, [editEntry, updatePassword, addPassword, resetToAddMode, showSuccess, showError]);
 
   // Handler cho edit operation
   const handleEdit = useCallback((entry: PasswordEntry) => {
@@ -247,6 +239,7 @@ const Index = () => {
         onClose={closeForm}
         onSave={handleSave}
         editEntry={editEntry}
+        formMode={formMode}
       />
     </div>
   );

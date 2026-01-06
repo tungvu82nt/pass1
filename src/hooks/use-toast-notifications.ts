@@ -1,43 +1,107 @@
 /**
- * useToastNotifications Hook - Refactored
- * Composite hook combining all toast functionality
- * 
- * Features:
- * - Backward compatibility với existing code
- * - Modular architecture với specialized hooks
- * - Better performance với focused responsibilities
- * - Easier testing và maintenance
- * 
- * Refactor: Tách thành multiple specialized hooks:
- * - useBasicToast: Core toast functionality
- * - useEnhancedToast: Advanced features với actions
- * - useToastManager: Management utilities
+ * useToastNotifications Hook - Backward Compatible
+ * Đơn giản hóa nhưng vẫn hỗ trợ existing code
  */
 
-import { useBasicToast } from './toast/use-basic-toast';
-import { useEnhancedToast } from './toast/use-enhanced-toast';
-import { useToastManager } from './toast/use-toast-manager';
-import { UseToastNotificationsReturn } from '@/lib/types/toast-types';
+import { useCallback } from 'react';
+import { toast } from 'sonner';
+import { UseToastNotificationsReturn, ToastConfig } from '@/lib/types/toast-types';
+import { logger } from '@/lib/utils/logger';
 
 /**
- * Composite toast notifications hook
- * Provides backward compatibility while using modular architecture
+ * Hook đơn giản cho toast notifications với backward compatibility
+ * Supports both: 
+ * - showSuccess("message", { description: "details" })
+ * - showSuccess("message", { duration: 5000, action: {...} })
  */
 export const useToastNotifications = (): UseToastNotificationsReturn => {
-  const basicToast = useBasicToast();
-  const enhancedToast = useEnhancedToast();
-  const toastManager = useToastManager();
-  
+  const showSuccess = useCallback((
+    message: string, 
+    config: ToastConfig = {}
+  ) => {
+    // Support both simple description và advanced config
+    const toastConfig = typeof config === 'object' && 'description' in config
+      ? { description: config.description }
+      : config;
+      
+    toast.success(message, toastConfig);
+    logger.debug('Success toast shown', { message });
+  }, []);
+
+  const showError = useCallback((
+    message: string, 
+    config: ToastConfig = {}
+  ) => {
+    const toastConfig = typeof config === 'object' && 'description' in config
+      ? { description: config.description }
+      : config;
+      
+    toast.error(message, toastConfig);
+    logger.debug('Error toast shown', { message });
+  }, []);
+
+  const showInfo = useCallback((
+    message: string, 
+    config: ToastConfig = {}
+  ) => {
+    const toastConfig = typeof config === 'object' && 'description' in config
+      ? { description: config.description }
+      : config;
+      
+    toast.info(message, toastConfig);
+    logger.debug('Info toast shown', { message });
+  }, []);
+
+  const showWarning = useCallback((
+    message: string, 
+    config: ToastConfig = {}
+  ) => {
+    const toastConfig = typeof config === 'object' && 'description' in config
+      ? { description: config.description }
+      : config;
+      
+    toast.warning(message, toastConfig);
+    logger.debug('Warning toast shown', { message });
+  }, []);
+
+  // Advanced methods
+  const showSuccessWithUndo = useCallback((
+    message: string, 
+    onUndo: () => void
+  ) => {
+    toast.success(message, {
+      duration: 6000,
+      action: {
+        label: 'Hoàn tác',
+        onClick: onUndo
+      }
+    });
+  }, []);
+
+  const showErrorWithRetry = useCallback((
+    message: string, 
+    onRetry: () => void
+  ) => {
+    toast.error(message, {
+      duration: 8000,
+      action: {
+        label: 'Thử lại',
+        onClick: onRetry
+      }
+    });
+  }, []);
+
+  const dismissAll = useCallback(() => {
+    toast.dismiss();
+  }, []);
+
   return {
-    // Basic toast methods
-    ...basicToast,
-    
-    // Enhanced methods với actions
-    showSuccessWithUndo: enhancedToast.showSuccessWithUndo,
-    showErrorWithRetry: enhancedToast.showErrorWithRetry,
-    showInfoWithAction: enhancedToast.showInfoWithAction,
-    
-    // Management utilities
-    ...toastManager,
+    showSuccess,
+    showError,
+    showInfo,
+    showWarning,
+    showSuccessWithUndo,
+    showErrorWithRetry,
+    dismissAll,
   };
 };

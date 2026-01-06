@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordEntry, PasswordInsert } from "@/lib/types/models";
+import { FormMode } from '@/hooks/use-form-state';
 import { passwordEntrySchema, PasswordEntryFormData, generateSecurePassword, validatePasswordStrength } from "@/lib/validation/password-validation";
 import { logger } from "@/lib/utils/logger";
 
@@ -14,9 +15,13 @@ interface PasswordFormProps {
   onClose: () => void;
   onSave: (entry: PasswordInsert) => void;
   editEntry?: PasswordEntry;
+  formMode?: FormMode; // Optional để backward compatibility
 }
 
-export const PasswordForm = ({ isOpen, onClose, onSave, editEntry }: PasswordFormProps) => {
+export const PasswordForm = ({ isOpen, onClose, onSave, editEntry, formMode }: PasswordFormProps) => {
+  // Determine form mode - use prop if provided, fallback to editEntry check
+  const currentFormMode = formMode || (editEntry ? FormMode.EDIT : FormMode.ADD);
+  const isEditMode = currentFormMode === FormMode.EDIT;
   const {
     register,
     handleSubmit,
@@ -61,7 +66,7 @@ export const PasswordForm = ({ isOpen, onClose, onSave, editEntry }: PasswordFor
     try {
       logger.info("Submitting password form", { 
         service: data.service, 
-        isEdit: !!editEntry 
+        isEdit: isEditMode 
       });
       
       await onSave(data);
@@ -84,7 +89,7 @@ export const PasswordForm = ({ isOpen, onClose, onSave, editEntry }: PasswordFor
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {editEntry ? "Chỉnh sửa mật khẩu" : "Thêm mật khẩu mới"}
+            {isEditMode ? "Chỉnh sửa mật khẩu" : "Thêm mật khẩu mới"}
           </DialogTitle>
         </DialogHeader>
         
@@ -174,7 +179,7 @@ export const PasswordForm = ({ isOpen, onClose, onSave, editEntry }: PasswordFor
               Hủy
             </Button>
             <Button type="submit" variant="security" disabled={isSubmitting}>
-              {isSubmitting ? "Đang lưu..." : editEntry ? "Cập nhật" : "Lưu"}
+              {isSubmitting ? "Đang lưu..." : isEditMode ? "Cập nhật" : "Lưu"}
             </Button>
           </DialogFooter>
         </form>

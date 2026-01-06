@@ -84,10 +84,11 @@ export const ROUTES = {
  * API configuration cho hybrid approach
  */
 export const API_CONFIG = {
-  BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', `${ENV_ACCESS.getEnvVar('VITE_APP_URL', 'https://yapee.online')}/api/passwords`),
+  // Sử dụng relative URL cho Netlify Functions
+  BASE_URL: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', '/api'),
   // Smart sync enabling: production default true, có thể override bằng env var
   ENABLE_SYNC: ENV_ACCESS.getBooleanEnv('VITE_ENABLE_API_SYNC', ENV_ACCESS.isProduction),
-  TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 5000),
+  TIMEOUT: ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', 10000), // Tăng timeout lên 10s
 } as const;
 
 /**

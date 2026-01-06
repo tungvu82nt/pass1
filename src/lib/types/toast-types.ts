@@ -57,9 +57,10 @@ export interface ToastNotification {
 
 /**
  * Toast hook return type với enhanced methods
+ * Updated: Simplified interface để match với implementation mới
  */
 export interface UseToastNotificationsReturn {
-  // Basic methods
+  // Basic methods - Flexible config support
   showSuccess: (message: string, config?: ToastConfig) => void;
   showError: (message: string, config?: ToastConfig) => void;
   showInfo: (message: string, config?: ToastConfig) => void;
@@ -68,9 +69,7 @@ export interface UseToastNotificationsReturn {
   // Enhanced methods với common actions
   showSuccessWithUndo: (message: string, onUndo: () => void) => void;
   showErrorWithRetry: (message: string, onRetry: () => void) => void;
-  showInfoWithAction: (message: string, action: ToastAction) => void;
   
   // Utility methods
   dismissAll: () => void;
-  dismissByLevel: (level: ToastLevel) => void;
 }

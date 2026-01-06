@@ -37,7 +37,7 @@ export const usePasswordsNeon = () => {
         } finally {
             setLoading(false);
         }
-    }, [toast]);
+    }, [showError]);
 
     const addPassword = async (entry: PasswordInsert) => {
         try {
