@@ -28,7 +28,7 @@ export class ConfigurationMigrationAdapter {
     
     try {
       const unifiedConfig: UnifiedApplicationConfiguration = {
-        environment: 'production', // Default, will be overridden
+        environment: legacyConfig.environment.isProduction ? 'production' : 'development',
         version: legacyConfig.app.VERSION,
         createdAt: Date.now(),
         
@@ -38,7 +38,7 @@ export class ConfigurationMigrationAdapter {
           version: legacyConfig.app.VERSION,
         },
         
-        environment: {
+        env: {
           isDevelopment: legacyConfig.environment.isDevelopment,
           isProduction: legacyConfig.environment.isProduction,
           isTesting: false, // Not available in legacy

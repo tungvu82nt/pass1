@@ -89,3 +89,5 @@ server_pid.txt
 memory-safe-guard-source.zip
 memory-safe-guard.bundle
 clear-cache.bat
+# Local Netlify folder
+.netlify

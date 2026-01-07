@@ -29,28 +29,25 @@ export class ServiceFactory {
 
   /**
    * Detect best service type based on environment
+   * Updated: Force NeonDB only
    */
-  private static detectServiceType(): 'neondb' | 'indexeddb' {
-    // Kiểm tra environment variables
+  private static detectServiceType(): 'neondb' {
+    // Always return NeonDB - no more IndexedDB fallback
     const hasNeonConfig = ENV_CONFIG.DATABASE_URL && ENV_CONFIG.DATABASE_URL.length > 0;
-    const forceNeonDB = ENV_CONFIG.USE_NEONDB;
-    const isProduction = ENV_CONFIG.isProduction;
+    const forceNeonDB = ENV_CONFIG.FORCE_NEONDB;
+    const disableIndexedDB = ENV_CONFIG.DISABLE_INDEXEDDB;
 
-    if (forceNeonDB || hasNeonConfig) {
-      logger.info('Auto-detected Neon DB configuration', { 
-        hasNeonConfig, 
-        forceNeonDB, 
-        isProduction 
-      });
-      return 'neondb';
+    if (!hasNeonConfig) {
+      throw new Error('DATABASE_URL is required. NeonDB is the only supported database.');
     }
 
-    logger.info('Using IndexedDB as fallback', { 
+    logger.info('Using NeonDB as the only database option', { 
       hasNeonConfig, 
-      forceNeonDB, 
-      isProduction 
+      forceNeonDB,
+      disableIndexedDB
     });
-    return 'indexeddb';
+    
+    return 'neondb';
   }
 
   /**
@@ -84,60 +81,33 @@ export class ServiceFactory {
 
   /**
    * Create password service with proper dependencies
-   * Enhanced: Auto-detection và smart fallback
+   * Updated: NeonDB only - no IndexedDB fallback
    */
-  static createPasswordService(config: ServiceFactoryConfig = {}): PasswordService | NeonPasswordService {
+  static createPasswordService(config: ServiceFactoryConfig = {}): NeonPasswordService {
     const {
       enableApiSync = API_CONFIG.ENABLE_SYNC,
-      repositoryType,
-      useNeonDB,
-      forceNeonDB = false
+      forceNeonDB = true // Always force NeonDB
     } = config;
 
-    // Auto-detect service type nếu không được chỉ định
-    const detectedType = repositoryType || this.detectServiceType();
-    const shouldUseNeonDB = forceNeonDB || useNeonDB || detectedType === 'neondb';
-
-    if (shouldUseNeonDB) {
-      const key = `neon-password-service-${enableApiSync}`;
-      
-      if (!this.services.has(key)) {
-        logger.info('Creating NeonPasswordService instance', { 
-          enableApiSync,
-          apiBaseUrl: API_CONFIG.BASE_URL 
-        });
-        
-        const service = new NeonPasswordService({
-          apiBaseUrl: API_CONFIG.BASE_URL,
-          timeout: API_CONFIG.TIMEOUT,
-          enableEncryption: !!ENV_CONFIG.ENCRYPTION_KEY
-        });
-        
-        this.services.set(key, service);
-      }
-
-      return this.services.get(key)! as NeonPasswordService;
-    }
-
-    // Fallback to IndexedDB service
-    const key = `password-service-${detectedType}-${enableApiSync}`;
+    // Always use NeonDB - no fallback
+    const key = `neon-password-service-${enableApiSync}`;
     
     if (!this.services.has(key)) {
-      logger.info('Creating IndexedDB PasswordService instance', { 
-        repositoryType: detectedType,
-        enableApiSync 
+      logger.info('Creating NeonPasswordService instance (NeonDB only mode)', { 
+        enableApiSync,
+        apiBaseUrl: API_CONFIG.BASE_URL 
       });
       
-      // Create repository
-      const repository = this.createPasswordRepository(detectedType);
-      
-      // Create service with dependency injection
-      const service = PasswordService.getInstance({ enableApiSync });
+      const service = new NeonPasswordService({
+        apiBaseUrl: API_CONFIG.BASE_URL,
+        timeout: API_CONFIG.TIMEOUT,
+        enableEncryption: !!ENV_CONFIG.ENCRYPTION_KEY
+      });
       
       this.services.set(key, service);
     }
 
-    return this.services.get(key)! as PasswordService;
+    return this.services.get(key)! as NeonPasswordService;
   }
 
   /**
@@ -151,45 +121,37 @@ export class ServiceFactory {
   }
 
   /**
-   * Get default password service với smart detection
-   * Enhanced: Automatic service selection
+   * Get default password service - NeonDB only
    */
-  static getDefaultPasswordService(): PasswordService | NeonPasswordService {
-    const detectedType = this.detectServiceType();
-    
-    logger.info('Getting default password service', { 
-      detectedType,
+  static getDefaultPasswordService(): NeonPasswordService {
+    logger.info('Getting default password service (NeonDB only)', { 
       apiSync: API_CONFIG.ENABLE_SYNC 
     });
     
     return this.createPasswordService({
       enableApiSync: API_CONFIG.ENABLE_SYNC,
-      repositoryType: detectedType
+      forceNeonDB: true
     });
   }
 
   /**
-   * Force NeonDB service creation
+   * Force NeonDB service creation (same as default now)
    */
   static getNeonPasswordService(): NeonPasswordService {
-    logger.info('Force creating NeonPasswordService');
+    logger.info('Getting NeonPasswordService (default behavior)');
     
     return this.createPasswordService({
       forceNeonDB: true,
       enableApiSync: true
-    }) as NeonPasswordService;
+    });
   }
 
   /**
-   * Force IndexedDB service creation
+   * IndexedDB service is no longer available
+   * @deprecated IndexedDB is disabled in NeonDB-only mode
    */
-  static getIndexedDBPasswordService(): PasswordService {
-    logger.info('Force creating IndexedDB PasswordService');
-    
-    return this.createPasswordService({
-      repositoryType: 'indexeddb',
-      enableApiSync: false
-    }) as PasswordService;
+  static getIndexedDBPasswordService(): never {
+    throw new Error('IndexedDB is disabled. Only NeonDB is supported.');
   }
 
   /**
@@ -199,13 +161,15 @@ export class ServiceFactory {
     detectedType: string;
     hasNeonConfig: boolean;
     forceNeonDB: boolean;
+    disableIndexedDB: boolean;
     apiBaseUrl: string;
     enableApiSync: boolean;
   } {
     return {
       detectedType: this.detectServiceType(),
       hasNeonConfig: !!(ENV_CONFIG.DATABASE_URL && ENV_CONFIG.DATABASE_URL.length > 0),
-      forceNeonDB: ENV_CONFIG.USE_NEONDB,
+      forceNeonDB: ENV_CONFIG.FORCE_NEONDB,
+      disableIndexedDB: ENV_CONFIG.DISABLE_INDEXEDDB,
       apiBaseUrl: API_CONFIG.BASE_URL,
       enableApiSync: API_CONFIG.ENABLE_SYNC
     };

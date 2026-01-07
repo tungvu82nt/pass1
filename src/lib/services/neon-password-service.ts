@@ -173,14 +173,13 @@ export class NeonPasswordService {
     try {
       logger.info('Fetching all passwords from Neon DB');
 
-      const response = await this.makeRequest<NeonPasswordEntry[]>('/passwords');
+      const response = await this.makeRequest<NeonApiResponse<NeonPasswordEntry[]>>('/passwords');
 
-      // API trả về array trực tiếp, không phải wrapped object
-      if (!Array.isArray(response)) {
-        throw new AppError('Invalid response format from server', 500);
+      if (!response.success || !response.data) {
+        throw new AppError(response.error || 'Failed to fetch passwords', 500);
       }
 
-      const passwords = response.map(entry => this.transformFromNeon(entry));
+      const passwords = response.data.map(entry => this.transformFromNeon(entry));
       
       logger.info('Successfully fetched passwords from Neon DB', { count: passwords.length });
       return passwords;
@@ -203,14 +202,13 @@ export class NeonPasswordService {
       }
 
       const endpoint = `/passwords${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-      const response = await this.makeRequest<NeonPasswordEntry[]>(endpoint);
+      const response = await this.makeRequest<NeonApiResponse<NeonPasswordEntry[]>>(endpoint);
 
-      // API trả về array trực tiếp, không phải wrapped object
-      if (!Array.isArray(response)) {
-        throw new AppError('Invalid response format from server', 500);
+      if (!response.success || !response.data) {
+        throw new AppError(response.error || 'Failed to search passwords', 500);
       }
 
-      const passwords = response.map(entry => this.transformFromNeon(entry));
+      const passwords = response.data.map(entry => this.transformFromNeon(entry));
       
       logger.info('Successfully searched passwords in Neon DB', { 
         query, 

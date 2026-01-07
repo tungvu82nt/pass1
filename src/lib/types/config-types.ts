@@ -14,13 +14,15 @@ export interface AppConfig {
 
 /**
  * Environment configuration type
- * Updated: Thêm Neon DB và encryption support
+ * Updated: Force NeonDB only configuration
  */
 export interface EnvironmentConfig {
   readonly isDevelopment: boolean;
   readonly isProduction: boolean;
   readonly DATABASE_URL: string;
   readonly USE_NEONDB: boolean;
+  readonly FORCE_NEONDB: boolean;
+  readonly DISABLE_INDEXEDDB: boolean;
   readonly ENCRYPTION_KEY: string;
 }
 

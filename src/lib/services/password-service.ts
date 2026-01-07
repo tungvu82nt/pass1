@@ -14,7 +14,7 @@ import { PasswordEntry, PasswordInsert, PasswordStats } from '@/lib/types/models
 import { db } from '@/lib/db/db';
 import { PasswordApiService } from '@/lib/api/password-api';
 import { logger } from '@/lib/utils/logger';
-import { getCurrentConfig, validateUrlConfiguration } from '@/lib/config';
+import { getCurrentConfig } from '@/lib/config';
 
 /**
  * Service configuration

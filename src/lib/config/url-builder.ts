@@ -76,11 +76,19 @@ export class ApiUrlBuilder {
 
       // Environment-specific logic
       if (ENV_ACCESS.isProduction) {
-        cachedApiBaseUrl = this.buildProductionApiUrl();
+        // Production: Sử dụng production API URL hoặc fallback to IndexedDB
+        const productionApiUrl = ENV_ACCESS.getEnvVar('VITE_PRODUCTION_API_BASE_URL');
+        if (productionApiUrl && isValidUrl(productionApiUrl)) {
+          cachedApiBaseUrl = productionApiUrl;
+          logger.info('Using production API URL', { url: productionApiUrl });
+        } else {
+          // Fallback: Disable API sync cho production nếu không có backend
+          logger.warn('No production API URL configured, will use IndexedDB only');
+          cachedApiBaseUrl = ''; // Empty string để trigger IndexedDB fallback
+        }
       } else {
-        // Development: build full URL for validation
-        const devBaseUrl = 'http://localhost:8080';
-        cachedApiBaseUrl = `${devBaseUrl}${DEPLOYMENT_CONSTANTS.DEV_API_PATH}`;
+        // Development: localhost API
+        cachedApiBaseUrl = 'http://localhost:3001/api';
       }
 
       logger.info('API Base URL built', { 
@@ -154,10 +162,23 @@ export class ApiUrlBuilder {
 }
 
 /**
- * Convenience functions cho backward compatibility
+ * Build API base URL based on environment
+ * Updated: NeonDB only mode với Netlify Functions
  */
-export const buildApiBaseUrl = () => ApiUrlBuilder.buildApiBaseUrl();
-export const validateUrlConfiguration = () => ApiUrlBuilder.validateConfiguration();
+export function buildApiBaseUrl(): string {
+  const isDevelopment = import.meta.env.DEV;
+  const isProduction = import.meta.env.PROD;
+  
+  // Always use Netlify Functions for consistency
+  const netlifyFunctionsUrl = 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions';
+  
+  logger.info('Using Netlify Functions API (NeonDB only mode)', { 
+    url: netlifyFunctionsUrl,
+    environment: isProduction ? 'production' : 'development'
+  });
+  
+  return netlifyFunctionsUrl;
+}
 
 /**
  * Type definitions

@@ -49,7 +49,6 @@ export { config as environmentConfig } from './environment';
 export { 
   ApiUrlBuilder, 
   buildApiBaseUrl, 
-  validateUrlConfiguration, 
   DEPLOYMENT_CONSTANTS 
 } from './url-builder';
 export type { UrlValidationResult } from './url-builder';

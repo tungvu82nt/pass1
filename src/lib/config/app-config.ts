@@ -44,16 +44,18 @@ export const APP_CONFIG: AppConfig = {
  * Environment detection utilities
  * Centralized environment access với validation
  * 
- * Refactored: Thêm Neon DB configuration
+ * Refactored: Force NeonDB only configuration
  */
 export const ENV_CONFIG: EnvironmentConfig = {
   // App environment
   isDevelopment: ENV_ACCESS.isDevelopment,
   isProduction: ENV_ACCESS.isProduction,
   
-  // Database configuration
+  // Database configuration - ONLY NEONDB
   DATABASE_URL: ENV_ACCESS.getEnvVar('DATABASE_URL', ''),
-  USE_NEONDB: ENV_ACCESS.getBooleanEnv('VITE_USE_NEONDB', false),
+  USE_NEONDB: true, // Force NeonDB
+  FORCE_NEONDB: ENV_ACCESS.getBooleanEnv('VITE_FORCE_NEONDB', true),
+  DISABLE_INDEXEDDB: ENV_ACCESS.getBooleanEnv('VITE_DISABLE_INDEXEDDB', true),
   
   // Encryption configuration
   ENCRYPTION_KEY: ENV_ACCESS.getEnvVar('VITE_ENCRYPTION_KEY', ''),
@@ -120,11 +122,20 @@ export const API_CONFIG: ApiConfig = {
   // Clean URL construction với proper separation of concerns
   BASE_URL: buildApiBaseUrl(),
   // Smart sync configuration với proper fallback logic
-  ENABLE_SYNC: ENV_ACCESS.getBooleanEnv(
-    'VITE_ENABLE_API_SYNC', 
-    // Sử dụng fallback disabled để tránh timeout issues trong development
-    ENV_ACCESS.isDevelopment ? API_DEFAULTS.FALLBACK_SYNC_ENABLED : API_DEFAULTS.DEFAULT_SYNC_ENABLED
-  ),
+  ENABLE_SYNC: (() => {
+    const apiBaseUrl = buildApiBaseUrl();
+    const hasValidApi = apiBaseUrl && apiBaseUrl.length > 0 && !apiBaseUrl.includes('localhost') || !ENV_ACCESS.isProduction;
+    
+    // Disable sync nếu production mà không có valid API URL
+    if (ENV_ACCESS.isProduction && !hasValidApi) {
+      return false;
+    }
+    
+    return ENV_ACCESS.getBooleanEnv(
+      'VITE_ENABLE_API_SYNC', 
+      ENV_ACCESS.isDevelopment ? API_DEFAULTS.FALLBACK_SYNC_ENABLED : API_DEFAULTS.DEFAULT_SYNC_ENABLED
+    );
+  })(),
   TIMEOUT: Math.max(
     ENV_ACCESS.getNumberEnv('VITE_API_TIMEOUT', API_DEFAULTS.DEFAULT_TIMEOUT),
     API_DEFAULTS.MIN_TIMEOUT
