@@ -66,7 +66,7 @@ export class ConfigurationProvider {
    */
   public getConfiguration(options?: Partial<ConfigurationFactoryOptions>): UnifiedApplicationConfiguration {
     const startTime = performance.now();
-    
+
     try {
       // Return cached config if valid
       if (this.config && !this.shouldRefreshConfig()) {
@@ -119,7 +119,7 @@ export class ConfigurationProvider {
 
     const config: UnifiedApplicationConfiguration = {
       ...baseConfig,
-      
+
       app: {
         name: this.getAppName(profile),
         description: this.getAppDescription(profile),
@@ -195,7 +195,7 @@ export class ConfigurationProvider {
     };
 
     const baseConfig = baseConfigs[profile];
-    
+
     // Override với environment variables
     return {
       baseUrl: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', baseConfig.baseUrl),
@@ -256,8 +256,8 @@ export class ConfigurationProvider {
    * Create domain configuration
    */
   private createDomainConfiguration(profile: ConfigurationProfile) {
-    const domain = 'silver-bublanina-ab8828.netlify.app';
-    
+    const domain = 'harmonious-pothos-5f3f98.netlify.app';
+
     return {
       appName: 'Memory Safe Guard',
       appDescription: 'Ứng dụng quản lý mật khẩu hiện đại và an toàn',
@@ -392,7 +392,7 @@ export class ConfigurationProvider {
    */
   private determineProfile(profile?: ConfigurationProfile): ConfigurationProfile {
     if (profile) return profile;
-    
+
     if (ENV_ACCESS.isDevelopment) return 'development';
     if (ENV_ACCESS.getEnvVar('NODE_ENV') === 'test') return 'testing';
     return 'production';
@@ -413,7 +413,7 @@ export class ConfigurationProvider {
   }
 
   private getAppDescription(profile: ConfigurationProfile): string {
-    return profile === 'production' 
+    return profile === 'production'
       ? 'Ứng dụng quản lý mật khẩu hiện đại và an toàn'
       : `Ứng dụng quản lý mật khẩu - ${profile}`;
   }
@@ -483,11 +483,11 @@ export const configurationProvider = ConfigurationProvider.getInstance();
 /**
  * Convenience functions với type safety
  */
-export const getUnifiedConfig = (options?: Partial<ConfigurationFactoryOptions>) => 
+export const getUnifiedConfig = (options?: Partial<ConfigurationFactoryOptions>) =>
   configurationProvider.getConfiguration(options);
 
-export const validateConfig = (config: UnifiedApplicationConfiguration) => 
+export const validateConfig = (config: UnifiedApplicationConfiguration) =>
   configurationProvider.validateConfiguration(config);
 
-export const getConfigHealth = () => 
+export const getConfigHealth = () =>
   configurationProvider.getHealthStatus();

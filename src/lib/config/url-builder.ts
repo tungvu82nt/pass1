@@ -17,14 +17,14 @@ import { logger } from '@/lib/utils/logger';
  */
 export const DEPLOYMENT_CONSTANTS = {
   // Netlify deployment URLs
-  NETLIFY_FALLBACK_URL: 'https://silver-bublanina-ab8828.netlify.app',
+  NETLIFY_FALLBACK_URL: 'https://harmonious-pothos-5f3f98.netlify.app',
   NETLIFY_FUNCTIONS_PATH: '/.netlify/functions/api',
-  
+
   // Development URLs
   DEV_API_PATH: '/api',
-  
+
   // Default production domain
-  DEFAULT_PRODUCTION_URL: 'https://silver-bublanina-ab8828.netlify.app',
+  DEFAULT_PRODUCTION_URL: 'https://harmonious-pothos-5f3f98.netlify.app',
 } as const;
 
 /**
@@ -60,7 +60,7 @@ export class ApiUrlBuilder {
     }
 
     const endTimer = logger.time('buildApiBaseUrl');
-    
+
     try {
       // Kiểm tra explicit env var trước
       const explicitApiUrl = ENV_ACCESS.getEnvVar('VITE_API_BASE_URL');
@@ -91,9 +91,9 @@ export class ApiUrlBuilder {
         cachedApiBaseUrl = 'http://localhost:3001/api';
       }
 
-      logger.info('API Base URL built', { 
-        url: cachedApiBaseUrl, 
-        environment: ENV_ACCESS.isProduction ? 'production' : 'development' 
+      logger.info('API Base URL built', {
+        url: cachedApiBaseUrl,
+        environment: ENV_ACCESS.isProduction ? 'production' : 'development'
       });
 
       return cachedApiBaseUrl;
@@ -108,7 +108,7 @@ export class ApiUrlBuilder {
   private static buildProductionApiUrl(): string {
     const appUrl = this.getAppUrl();
     const apiPath = DEPLOYMENT_CONSTANTS.NETLIFY_FUNCTIONS_PATH;
-    
+
     return `${appUrl}${apiPath}`;
   }
 
@@ -122,7 +122,7 @@ export class ApiUrlBuilder {
 
     // Sử dụng fallback URL trực tiếp
     const fallbackUrl = DEPLOYMENT_CONSTANTS.NETLIFY_FALLBACK_URL;
-    logger.info('Using Netlify fallback URL', { 
+    logger.info('Using Netlify fallback URL', {
       fallback: fallbackUrl
     });
 
@@ -144,7 +144,7 @@ export class ApiUrlBuilder {
    */
   static validateConfiguration(): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
-    
+
     try {
       const apiUrl = this.buildApiBaseUrl();
       if (!isValidUrl(apiUrl)) {
@@ -168,15 +168,15 @@ export class ApiUrlBuilder {
 export function buildApiBaseUrl(): string {
   const isDevelopment = import.meta.env.DEV;
   const isProduction = import.meta.env.PROD;
-  
+
   // Always use Netlify Functions for consistency
-  const netlifyFunctionsUrl = 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions';
-  
-  logger.info('Using Netlify Functions API (NeonDB only mode)', { 
+  const netlifyFunctionsUrl = 'https://harmonious-pothos-5f3f98.netlify.app/.netlify/functions';
+
+  logger.info('Using Netlify Functions API (NeonDB only mode)', {
     url: netlifyFunctionsUrl,
     environment: isProduction ? 'production' : 'development'
   });
-  
+
   return netlifyFunctionsUrl;
 }
 

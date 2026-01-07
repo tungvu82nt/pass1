@@ -31,7 +31,7 @@ const mockIsProductionDomain = isProductionDomain as jest.MockedFunction<typeof 
 describe('ConfigurationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mocks với test constants
     mockGetCurrentUrl.mockReturnValue(TEST_CONSTANTS.PRODUCTION_URL);
     mockGetCurrentDomain.mockReturnValue(TEST_CONSTANTS.PRODUCTION_DOMAIN);
@@ -113,7 +113,7 @@ describe('ConfigurationService', () => {
 
     it('should fail validation with invalid URL', () => {
       mockGetCurrentUrl.mockReturnValue('invalid-url');
-      
+
       const result = configurationService.validateConfiguration();
       expect(result).toBe(false);
     });
@@ -121,7 +121,7 @@ describe('ConfigurationService', () => {
     it('should fail validation with empty values', () => {
       mockGetCurrentUrl.mockReturnValue('');
       mockGetCurrentDomain.mockReturnValue('');
-      
+
       const result = configurationService.validateConfiguration();
       expect(result).toBe(false);
     });
@@ -131,7 +131,7 @@ describe('ConfigurationService', () => {
     it('should return same instance', () => {
       const instance1 = configurationService;
       const instance2 = configurationService;
-      
+
       expect(instance1).toBe(instance2);
     });
   });
@@ -143,8 +143,8 @@ describe('ConfigurationService', () => {
 describe('Convenience Functions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetCurrentUrl.mockReturnValue('https://silver-bublanina-ab8828.netlify.app');
-    mockGetCurrentDomain.mockReturnValue('silver-bublanina-ab8828.netlify.app');
+    mockGetCurrentUrl.mockReturnValue('https://harmonious-pothos-5f3f98.netlify.app');
+    mockGetCurrentDomain.mockReturnValue('harmonious-pothos-5f3f98.netlify.app');
     mockIsProductionDomain.mockReturnValue(true);
   });
 
@@ -156,9 +156,9 @@ describe('Convenience Functions', () => {
       getConfiguredApiBaseUrl
     } = await import('../configuration-service');
 
-    expect(getConfiguredUrl()).toBe('https://silver-bublanina-ab8828.netlify.app');
-    expect(getConfiguredDomain()).toBe('silver-bublanina-ab8828.netlify.app');
+    expect(getConfiguredUrl()).toBe('https://harmonious-pothos-5f3f98.netlify.app');
+    expect(getConfiguredDomain()).toBe('harmonious-pothos-5f3f98.netlify.app');
     expect(isConfiguredProduction()).toBe(true);
-    expect(getConfiguredApiBaseUrl()).toBe('https://silver-bublanina-ab8828.netlify.app/api');
+    expect(getConfiguredApiBaseUrl()).toBe('https://harmonious-pothos-5f3f98.netlify.app/api');
   });
 });

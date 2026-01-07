@@ -14,10 +14,10 @@ import { logger } from './logger';
  * Domain migration constants
  */
 export const DOMAIN_MIGRATION = {
-  OLD_DOMAIN: 'yapee.online',
-  NEW_DOMAIN: 'silver-bublanina-ab8828.netlify.app',
-  OLD_URL: 'https://yapee.online',
-  NEW_URL: 'https://silver-bublanina-ab8828.netlify.app',
+  OLD_DOMAIN: 'silver-bublanina-ab8828.netlify.app',
+  NEW_DOMAIN: 'harmonious-pothos-5f3f98.netlify.app',
+  OLD_URL: 'https://silver-bublanina-ab8828.netlify.app',
+  NEW_URL: 'https://harmonious-pothos-5f3f98.netlify.app',
 } as const;
 
 /**
@@ -89,11 +89,11 @@ export class DomainMigrationUtil {
     const validation = this.validateDomainConsistency(urls);
     const totalUrls = urls.length;
     const needsMigration = validation.oldDomainUrls.length;
-    const migrationPercentage = totalUrls > 0 ? 
+    const migrationPercentage = totalUrls > 0 ?
       ((totalUrls - needsMigration) / totalUrls) * 100 : 100;
 
     const recommendations: string[] = [];
-    
+
     if (needsMigration > 0) {
       recommendations.push(
         `Update ${needsMigration} URLs to use new domain: ${DOMAIN_MIGRATION.NEW_DOMAIN}`
@@ -123,9 +123,9 @@ export class DomainMigrationUtil {
  * Convenience functions
  */
 export const migrateUrl = (url: string) => DomainMigrationUtil.migrateUrl(url);
-export const validateDomainConsistency = (urls: string[]) => 
+export const validateDomainConsistency = (urls: string[]) =>
   DomainMigrationUtil.validateDomainConsistency(urls);
-export const getMigrationReport = (urls: string[]) => 
+export const getMigrationReport = (urls: string[]) =>
   DomainMigrationUtil.getMigrationReport(urls);
 
 /**

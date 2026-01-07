@@ -38,7 +38,7 @@ const apiConfigSchema = z.object({
   path: ['BASE_URL'],
 }).refine((config) => {
   // Validate URL format
-  const isNetlifyFallback = config.BASE_URL.includes('silver-bublanina-ab8828.netlify.app');
+  const isNetlifyFallback = config.BASE_URL.includes('harmonious-pothos-5f3f98.netlify.app');
   if (isNetlifyFallback) {
     logger.info('Using Netlify deployment URL', {
       url: config.BASE_URL
@@ -131,7 +131,7 @@ export const validateAllConfigs = (configs: {
     database: validateDatabaseConfig(configs.database),
     domain: validateDomainConfig(configs.domain),
   };
-  
+
   logger.info('All configurations validated successfully');
   return results;
 };

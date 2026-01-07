@@ -66,7 +66,7 @@ class ConfigurationService implements IConfigurationService {
     } catch (error) {
       logger.error('Failed to get current URL', error as Error);
       // Fallback to production URL
-      return 'https://silver-bublanina-ab8828.netlify.app';
+      return 'https://harmonious-pothos-5f3f98.netlify.app';
     }
   }
 
@@ -79,7 +79,7 @@ class ConfigurationService implements IConfigurationService {
       return getCurrentDomain();
     } catch (error) {
       logger.error('Failed to get current domain', error as Error);
-      return 'silver-bublanina-ab8828.netlify.app';
+      return 'harmonious-pothos-5f3f98.netlify.app';
     }
   }
 
@@ -111,14 +111,14 @@ class ConfigurationService implements IConfigurationService {
     try {
       const url = getCurrentUrl();
       const domain = getCurrentDomain();
-      
+
       if (!url || !domain) {
         throw new Error('Invalid configuration: missing URL or domain');
       }
 
       // Validate URL format
       new URL(url);
-      
+
       logger.debug('Configuration validation passed', { url, domain });
       return true;
     } catch (error) {

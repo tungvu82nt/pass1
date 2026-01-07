@@ -5,18 +5,18 @@
 
 import fetch from 'node-fetch';
 
-const PRODUCTION_URL = 'https://silver-bublanina-ab8828.netlify.app';
+const PRODUCTION_URL = 'https://harmonious-pothos-5f3f98.netlify.app';
 
 /**
  * Test production frontend accessibility
  */
 async function testProductionFrontend() {
   console.log('🌐 Testing Production Frontend...');
-  
+
   try {
     const response = await fetch(PRODUCTION_URL);
     const html = await response.text();
-    
+
     // Check for key indicators
     const checks = {
       hasTitle: html.includes('Memory Safe Guard'),
@@ -34,7 +34,7 @@ async function testProductionFrontend() {
     });
 
     const allPassed = Object.values(checks).every(check => check);
-    
+
     if (allPassed) {
       console.log('    ✅ All frontend checks passed!');
       return true;
@@ -53,16 +53,16 @@ async function testProductionFrontend() {
  */
 async function testProductionAssets() {
   console.log('📦 Testing Production Assets...');
-  
+
   try {
     // Get main page to extract asset URLs
     const response = await fetch(PRODUCTION_URL);
     const html = await response.text();
-    
+
     // Extract asset URLs
     const jsMatch = html.match(/\/assets\/main-[^"]+\.js/);
     const cssMatch = html.match(/\/assets\/main-[^"]+\.css/);
-    
+
     if (!jsMatch || !cssMatch) {
       throw new Error('Could not find asset URLs in HTML');
     }
@@ -73,7 +73,7 @@ async function testProductionAssets() {
     // Test JS asset
     const jsResponse = await fetch(jsUrl);
     const jsSize = parseInt(jsResponse.headers.get('content-length') || '0');
-    
+
     // Test CSS asset
     const cssResponse = await fetch(cssUrl);
     const cssSize = parseInt(cssResponse.headers.get('content-length') || '0');
@@ -81,7 +81,7 @@ async function testProductionAssets() {
     console.log('  ✓ Asset Loading:');
     console.log(`    ✅ JavaScript: ${jsUrl} (${(jsSize / 1024).toFixed(1)}KB)`);
     console.log(`    ✅ CSS: ${cssUrl} (${(cssSize / 1024).toFixed(1)}KB)`);
-    
+
     return jsResponse.ok && cssResponse.ok;
   } catch (error) {
     console.error('❌ Production assets test failed:', error.message);
@@ -94,20 +94,20 @@ async function testProductionAssets() {
  */
 async function testProductionPerformance() {
   console.log('⚡ Testing Production Performance...');
-  
+
   try {
     const startTime = Date.now();
     const response = await fetch(PRODUCTION_URL);
     const endTime = Date.now();
-    
+
     const responseTime = endTime - startTime;
     const contentLength = parseInt(response.headers.get('content-length') || '0');
-    
+
     console.log('  ✓ Performance Metrics:');
     console.log(`    ✅ Response Time: ${responseTime}ms`);
     console.log(`    ✅ Content Size: ${(contentLength / 1024).toFixed(1)}KB`);
     console.log(`    ✅ Status: ${response.status} ${response.statusText}`);
-    
+
     // Performance thresholds
     const performanceChecks = {
       responseTime: responseTime < 3000, // < 3 seconds
@@ -116,13 +116,13 @@ async function testProductionPerformance() {
     };
 
     const allGood = Object.values(performanceChecks).every(check => check);
-    
+
     if (allGood) {
       console.log('    ✅ Performance within acceptable limits');
     } else {
       console.log('    ⚠️ Performance issues detected');
     }
-    
+
     return allGood;
   } catch (error) {
     console.error('❌ Production performance test failed:', error.message);
@@ -135,11 +135,11 @@ async function testProductionPerformance() {
  */
 async function testProductionSecurity() {
   console.log('🔒 Testing Production Security...');
-  
+
   try {
     const response = await fetch(PRODUCTION_URL);
     const headers = response.headers;
-    
+
     const securityChecks = {
       hasContentType: headers.has('content-type'),
       hasXFrameOptions: headers.has('x-frame-options'),
@@ -165,11 +165,11 @@ async function testProductionSecurity() {
  */
 async function testProductionSEO() {
   console.log('🔍 Testing Production SEO...');
-  
+
   try {
     const response = await fetch(PRODUCTION_URL);
     const html = await response.text();
-    
+
     const seoChecks = {
       hasTitle: /<title>.*Memory Safe Guard.*<\/title>/.test(html),
       hasDescription: /<meta name="description"/.test(html),
@@ -185,7 +185,7 @@ async function testProductionSEO() {
 
     const seoScore = Object.values(seoChecks).filter(Boolean).length;
     console.log(`    📊 SEO Score: ${seoScore}/${Object.keys(seoChecks).length}`);
-    
+
     return seoScore >= 4; // At least 4/5 SEO elements
   } catch (error) {
     console.error('❌ Production SEO test failed:', error.message);
@@ -199,7 +199,7 @@ async function testProductionSEO() {
 async function runProductionTests() {
   console.log('🚀 Starting Production Deployment Tests...\n');
   console.log(`🎯 Testing: ${PRODUCTION_URL}\n`);
-  
+
   const results = {
     frontend: false,
     assets: false,
@@ -211,16 +211,16 @@ async function runProductionTests() {
   // Run all tests
   results.frontend = await testProductionFrontend();
   console.log('');
-  
+
   results.assets = await testProductionAssets();
   console.log('');
-  
+
   results.performance = await testProductionPerformance();
   console.log('');
-  
+
   results.security = await testProductionSecurity();
   console.log('');
-  
+
   results.seo = await testProductionSEO();
   console.log('');
 
@@ -234,10 +234,10 @@ async function runProductionTests() {
 
   const passedTests = Object.values(results).filter(Boolean).length;
   const totalTests = Object.keys(results).length;
-  
+
   console.log('\n' + '='.repeat(60));
   console.log(`📈 Overall Score: ${passedTests}/${totalTests} tests passed`);
-  
+
   if (passedTests === totalTests) {
     console.log('🎉 ALL PRODUCTION TESTS PASSED!');
     console.log('✅ Memory Safe Guard is ready for production use!');

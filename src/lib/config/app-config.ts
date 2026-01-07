@@ -7,15 +7,15 @@ import { QueryClient } from "@tanstack/react-query";
 import { ENV_ACCESS } from './env-utils';
 import { buildApiBaseUrl } from './url-builder';
 import { getAppVersion } from '@/lib/utils/version-utils';
-import type { 
-  AppConfig, 
-  EnvironmentConfig, 
-  ThemeConfig, 
-  ApiConfig, 
-  DatabaseConfig, 
-  DomainConfig, 
+import type {
+  AppConfig,
+  EnvironmentConfig,
+  ThemeConfig,
+  ApiConfig,
+  DatabaseConfig,
+  DomainConfig,
   TimeConstants,
-  RoutesConfig 
+  RoutesConfig
 } from '@/lib/types/config-types';
 
 /**
@@ -50,13 +50,13 @@ export const ENV_CONFIG: EnvironmentConfig = {
   // App environment
   isDevelopment: ENV_ACCESS.isDevelopment,
   isProduction: ENV_ACCESS.isProduction,
-  
+
   // Database configuration - ONLY NEONDB
   DATABASE_URL: ENV_ACCESS.getEnvVar('DATABASE_URL', ''),
   USE_NEONDB: true, // Force NeonDB
   FORCE_NEONDB: ENV_ACCESS.getBooleanEnv('VITE_FORCE_NEONDB', true),
   DISABLE_INDEXEDDB: ENV_ACCESS.getBooleanEnv('VITE_DISABLE_INDEXEDDB', true),
-  
+
   // Encryption configuration
   ENCRYPTION_KEY: ENV_ACCESS.getEnvVar('VITE_ENCRYPTION_KEY', ''),
 } as const;
@@ -125,14 +125,14 @@ export const API_CONFIG: ApiConfig = {
   ENABLE_SYNC: (() => {
     const apiBaseUrl = buildApiBaseUrl();
     const hasValidApi = apiBaseUrl && apiBaseUrl.length > 0 && !apiBaseUrl.includes('localhost') || !ENV_ACCESS.isProduction;
-    
+
     // Disable sync nếu production mà không có valid API URL
     if (ENV_ACCESS.isProduction && !hasValidApi) {
       return false;
     }
-    
+
     return ENV_ACCESS.getBooleanEnv(
-      'VITE_ENABLE_API_SYNC', 
+      'VITE_ENABLE_API_SYNC',
       ENV_ACCESS.isDevelopment ? API_DEFAULTS.FALLBACK_SYNC_ENABLED : API_DEFAULTS.DEFAULT_SYNC_ENABLED
     );
   })(),
@@ -156,7 +156,7 @@ export const DATABASE_CONFIG: DatabaseConfig = {
  * Domain configuration
  * Refactored: Loại bỏ trùng lặp và tạo computed properties
  */
-const DOMAIN_BASE = "silver-bublanina-ab8828.netlify.app" as const;
+const DOMAIN_BASE = "harmonious-pothos-5f3f98.netlify.app" as const;
 
 export const DOMAIN_CONFIG: DomainConfig = {
   APP_NAME: "Memory Safe Guard",

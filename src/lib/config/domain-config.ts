@@ -9,8 +9,8 @@ import { ENV_ACCESS } from './env-utils';
  * Domain configuration constants
  */
 export const DOMAINS = {
-  PRODUCTION: "silver-bublanina-ab8828.netlify.app",
-  STAGING: "staging.silver-bublanina-ab8828.netlify.app", // Cho tương lai
+  PRODUCTION: "harmonious-pothos-5f3f98.netlify.app",
+  STAGING: "staging.harmonious-pothos-5f3f98.netlify.app", // Cho tương lai
   LOCAL: "localhost",
 } as const;
 

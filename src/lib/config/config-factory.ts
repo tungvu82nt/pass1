@@ -81,7 +81,7 @@ export class ConfigurationFactory {
         retryDelay: 1000,
       },
       production: {
-        baseUrl: 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions/api',
+        baseUrl: 'https://harmonious-pothos-5f3f98.netlify.app/.netlify/functions/api',
         enableSync: true,
         timeout: 5000,
         retryAttempts: 3,
@@ -97,7 +97,7 @@ export class ConfigurationFactory {
     };
 
     const config = baseConfigs[profile];
-    
+
     // Override với environment variables nếu có
     return {
       baseUrl: ENV_ACCESS.getEnvVar('VITE_API_BASE_URL', config.baseUrl),
@@ -197,7 +197,7 @@ export class ConfigurationFactory {
 
     // Cache configuration
     this.cache.set(profile, config);
-    
+
     logger.debug('Configuration created and cached', { profile, config });
     return config;
   }
@@ -207,7 +207,7 @@ export class ConfigurationFactory {
    */
   public static getCurrentConfiguration(): CompleteConfiguration {
     let profile: ConfigProfile;
-    
+
     if (ENV_ACCESS.isDevelopment) {
       profile = 'development';
     } else if (ENV_ACCESS.getEnvVar('NODE_ENV') === 'test') {
@@ -268,5 +268,5 @@ export const getCurrentConfig = () => ConfigurationFactory.getCurrentConfigurati
 /**
  * Convenience function để get specific profile config
  */
-export const getConfigForProfile = (profile: ConfigProfile) => 
+export const getConfigForProfile = (profile: ConfigProfile) =>
   ConfigurationFactory.createConfiguration(profile);

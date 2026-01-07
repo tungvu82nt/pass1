@@ -13,19 +13,19 @@
  */
 export const TEST_CONSTANTS = {
   // Production URLs
-  PRODUCTION_DOMAIN: 'silver-bublanina-ab8828.netlify.app',
-  PRODUCTION_URL: 'https://silver-bublanina-ab8828.netlify.app',
-  PRODUCTION_API_URL: 'https://silver-bublanina-ab8828.netlify.app/.netlify/functions/api',
-  
+  PRODUCTION_DOMAIN: 'harmonious-pothos-5f3f98.netlify.app',
+  PRODUCTION_URL: 'https://harmonious-pothos-5f3f98.netlify.app',
+  PRODUCTION_API_URL: 'https://harmonious-pothos-5f3f98.netlify.app/.netlify/functions/api',
+
   // Development URLs
   DEV_DOMAIN: 'localhost',
   DEV_URL: 'http://localhost:8080',
   DEV_API_URL: '/api',
-  
+
   // Test URLs
   CUSTOM_API_URL: 'https://custom-api.example.com/api',
   INVALID_URL: 'not-a-valid-url',
-  
+
   // Mock data
   MOCK_PASSWORD_ENTRY: {
     id: 'test-id-123',
@@ -36,7 +36,7 @@ export const TEST_CONSTANTS = {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
   },
-  
+
   // API responses
   MOCK_API_RESPONSES: {
     SUCCESS: { success: true, data: [] },
@@ -52,12 +52,12 @@ export const TEST_UTILS = {
    * Tạo mock URL với domain
    */
   createMockUrl: (domain: string, path = '') => `https://${domain}${path}`,
-  
+
   /**
    * Tạo mock API URL
    */
   createMockApiUrl: (domain: string) => `https://${domain}/.netlify/functions/api`,
-  
+
   /**
    * Validate URL format
    */
