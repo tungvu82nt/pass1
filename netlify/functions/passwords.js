@@ -39,38 +39,53 @@ const handleCors = (event) => {
 const ensureTable = async (client) => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS passwords (
-      id SERIAL PRIMARY KEY,
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       service VARCHAR(255) NOT NULL,
       username VARCHAR(255) NOT NULL,
       password TEXT NOT NULL,
+      url VARCHAR(500),
       notes TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      folder VARCHAR(255),
+      tags TEXT[],
+      expires_at TIMESTAMP WITH TIME ZONE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       UNIQUE(service, username)
     );
     
     CREATE INDEX IF NOT EXISTS idx_passwords_service ON passwords(service);
     CREATE INDEX IF NOT EXISTS idx_passwords_username ON passwords(username);
-    CREATE INDEX IF NOT EXISTS idx_passwords_updated_at ON passwords(updated_at);
+    CREATE INDEX IF NOT EXISTS idx_passwords_updated_at ON passwords(updated_at DESC);
   `;
-  
+
   await client.query(createTableQuery);
 };
 
 // GET - Lấy tất cả passwords
-const getPasswords = async () => {
+const getPasswords = async (event) => {
   const pool = getPool();
   const client = await pool.connect();
-  
+  const search = event.queryStringParameters && event.queryStringParameters.search;
+
   try {
-    await ensureTable(client);
-    
-    const result = await client.query(`
-      SELECT id, service, username, password, notes, created_at, updated_at 
+    // await ensureTable(client); // Skip ensuring on every read for performance
+
+    let query = `
+      SELECT id, service, username, password, url, notes, folder, tags, created_at, updated_at 
       FROM passwords 
-      ORDER BY updated_at DESC
-    `);
-    
+    `;
+
+    const params = [];
+
+    if (search) {
+      query += ` WHERE service ILIKE $1 OR username ILIKE $1 `;
+      params.push(`%${search}%`);
+    }
+
+    query += ` ORDER BY updated_at DESC`;
+
+    const result = await client.query(query, params);
+
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -87,8 +102,8 @@ const getPasswords = async () => {
 
 // POST - Tạo password mới
 const createPassword = async (data) => {
-  const { service, username, password, notes = '' } = data;
-  
+  const { service, username, password, url, notes, folder, tags } = data;
+
   if (!service || !username || !password) {
     return {
       statusCode: 400,
@@ -99,24 +114,27 @@ const createPassword = async (data) => {
       })
     };
   }
-  
+
   const pool = getPool();
   const client = await pool.connect();
-  
+
   try {
-    await ensureTable(client);
-    
+    // await ensureTable(client);
+
     const result = await client.query(`
-      INSERT INTO passwords (service, username, password, notes, updated_at)
-      VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+      INSERT INTO passwords (service, username, password, url, notes, folder, tags, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
       ON CONFLICT (service, username) 
       DO UPDATE SET 
         password = EXCLUDED.password,
+        url = EXCLUDED.url,
         notes = EXCLUDED.notes,
-        updated_at = CURRENT_TIMESTAMP
-      RETURNING id, service, username, password, notes, created_at, updated_at
-    `, [service, username, password, notes]);
-    
+        folder = EXCLUDED.folder,
+        tags = EXCLUDED.tags,
+        updated_at = NOW()
+      RETURNING *
+    `, [service, username, password, url || null, notes || null, folder || null, tags || null]);
+
     return {
       statusCode: 201,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -132,8 +150,8 @@ const createPassword = async (data) => {
 
 // PUT - Cập nhật password
 const updatePassword = async (id, data) => {
-  const { service, username, password, notes = '' } = data;
-  
+  const { service, username, password, url, notes, folder, tags } = data;
+
   if (!service || !username || !password) {
     return {
       statusCode: 400,
@@ -144,20 +162,18 @@ const updatePassword = async (id, data) => {
       })
     };
   }
-  
+
   const pool = getPool();
   const client = await pool.connect();
-  
+
   try {
-    await ensureTable(client);
-    
     const result = await client.query(`
       UPDATE passwords 
-      SET service = $1, username = $2, password = $3, notes = $4, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
-      RETURNING id, service, username, password, notes, created_at, updated_at
-    `, [service, username, password, notes, id]);
-    
+      SET service = $1, username = $2, password = $3, url = $4, notes = $5, folder = $6, tags = $7, updated_at = NOW()
+      WHERE id = $8
+      RETURNING *
+    `, [service, username, password, url || null, notes || null, folder || null, tags || null, id]);
+
     if (result.rows.length === 0) {
       return {
         statusCode: 404,
@@ -168,7 +184,7 @@ const updatePassword = async (id, data) => {
         })
       };
     }
-    
+
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -186,15 +202,13 @@ const updatePassword = async (id, data) => {
 const deletePassword = async (id) => {
   const pool = getPool();
   const client = await pool.connect();
-  
+
   try {
-    await ensureTable(client);
-    
     const result = await client.query(`
       DELETE FROM passwords WHERE id = $1
       RETURNING id, service, username
     `, [id]);
-    
+
     if (result.rows.length === 0) {
       return {
         statusCode: 404,
@@ -205,7 +219,7 @@ const deletePassword = async (id) => {
         })
       };
     }
-    
+
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -226,7 +240,7 @@ exports.handler = async (event, context) => {
     // Handle CORS
     const corsResponse = handleCors(event);
     if (corsResponse) return corsResponse;
-    
+
     // Check database connection
     if (!process.env.DATABASE_URL) {
       return {
@@ -238,15 +252,18 @@ exports.handler = async (event, context) => {
         })
       };
     }
-    
+
     const method = event.httpMethod;
     const path = event.path;
-    
-    // Parse ID from path if present (e.g., /passwords/123)
+
+    // Parse ID from path
     const pathParts = path.split('/');
     const id = pathParts[pathParts.length - 1];
-    const isIdPath = !isNaN(parseInt(id));
-    
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isIdPath = uuidRegex.test(id);
+
     // Parse request body
     let body = {};
     if (event.body) {
@@ -263,15 +280,15 @@ exports.handler = async (event, context) => {
         };
       }
     }
-    
+
     // Route requests
     switch (method) {
       case 'GET':
-        return await getPasswords();
-        
+        return await getPasswords(event);
+
       case 'POST':
         return await createPassword(body);
-        
+
       case 'PUT':
         if (!isIdPath) {
           return {
@@ -279,12 +296,12 @@ exports.handler = async (event, context) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               success: false,
-              error: 'ID required for update'
+              error: 'Valid UUID required for update'
             })
           };
         }
-        return await updatePassword(parseInt(id), body);
-        
+        return await updatePassword(id, body);
+
       case 'DELETE':
         if (!isIdPath) {
           return {
@@ -292,12 +309,12 @@ exports.handler = async (event, context) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               success: false,
-              error: 'ID required for delete'
+              error: 'Valid UUID required for delete'
             })
           };
         }
-        return await deletePassword(parseInt(id));
-        
+        return await deletePassword(id);
+
       default:
         return {
           statusCode: 405,
@@ -308,10 +325,10 @@ exports.handler = async (event, context) => {
           })
         };
     }
-    
+
   } catch (error) {
     console.error('Function error:', error);
-    
+
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

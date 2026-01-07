@@ -84,6 +84,20 @@ async function migrate() {
     `);
         console.log('✅ Trigger "update_passwords_updated_at" created.');
 
+        // 5. Create Unique Constraint (Required for ON CONFLICT)
+        try {
+            await client.query(`
+                ALTER TABLE passwords 
+                DROP CONSTRAINT IF EXISTS passwords_service_username_key;
+                
+                ALTER TABLE passwords
+                ADD CONSTRAINT passwords_service_username_key UNIQUE (service, username);
+            `);
+            console.log('✅ Unique constraint "passwords_service_username_key" checked/created.');
+        } catch (e) {
+            console.log('⚠️ Could not create unique constraint (might be duplicates):', e.message);
+        }
+
         console.log('🎉 Migration completed successfully!');
 
     } catch (err) {
